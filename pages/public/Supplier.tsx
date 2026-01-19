@@ -1,28 +1,58 @@
+
 import React, { useState, useEffect } from 'react';
 import { storageService } from '../../services/store';
 import { SupplierPost } from '../../types';
 import { Container, Section, Card, Button, FadeIn, Input, Textarea } from '../../components/Shared';
-import { Handshake, TrendingUp, Users, CheckCircle } from 'lucide-react';
+import { Handshake, TrendingUp, Users, CheckCircle, Loader2 } from 'lucide-react';
 
 const Supplier = () => {
   const [posts, setPosts] = useState<SupplierPost[]>([]);
   const [formState, setFormState] = useState({ name: '', email: '', phone: '', message: '' });
   const [submitted, setSubmitted] = useState(false);
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   useEffect(() => {
     setPosts(storageService.getSupplierPosts().filter(p => p.status === 'published'));
   }, []);
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    storageService.addSubmission({
-      type: 'supplier_contact',
-      name: formState.name,
-      email: formState.email,
-      phone: formState.phone,
-      message: `Supplier Contact:\n${formState.message}`
-    });
-    setSubmitted(true);
+    setIsSubmitting(true);
+
+    const formData = {
+        form_type: 'supplier_contact',
+        name: formState.name,
+        email: formState.email,
+        phone: formState.phone,
+        message: formState.message,
+        _subject: `New Supplier Contact: ${formState.name}`
+    };
+
+    try {
+        const response = await fetch('https://formspree.io/f/mwvvovbk', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(formData)
+        });
+
+        if (response.ok) {
+            storageService.addSubmission({
+                type: 'supplier_contact',
+                name: formState.name,
+                email: formState.email,
+                phone: formState.phone,
+                message: `Supplier Contact:\n${formState.message}`
+            });
+            setSubmitted(true);
+        } else {
+            alert("Có lỗi xảy ra khi gửi. Vui lòng thử lại.");
+        }
+    } catch (error) {
+        console.error(error);
+        alert("Lỗi kết nối.");
+    } finally {
+        setIsSubmitting(false);
+    }
   };
 
   return (
@@ -106,6 +136,7 @@ const Supplier = () => {
                             required 
                             value={formState.name}
                             onChange={e => setFormState({...formState, name: e.target.value})}
+                            disabled={isSubmitting}
                           />
                           <div className="grid md:grid-cols-2 gap-4">
                               <Input 
@@ -114,6 +145,7 @@ const Supplier = () => {
                                 required 
                                 value={formState.email}
                                 onChange={e => setFormState({...formState, email: e.target.value})}
+                                disabled={isSubmitting}
                               />
                               <Input 
                                 label="Số điện thoại" 
@@ -121,6 +153,7 @@ const Supplier = () => {
                                 required 
                                 value={formState.phone}
                                 onChange={e => setFormState({...formState, phone: e.target.value})}
+                                disabled={isSubmitting}
                               />
                           </div>
                           <Textarea 
@@ -128,8 +161,11 @@ const Supplier = () => {
                             rows={4} 
                             value={formState.message}
                             onChange={e => setFormState({...formState, message: e.target.value})}
+                            disabled={isSubmitting}
                           />
-                          <Button type="submit" size="lg" className="w-full">Gửi thông tin</Button>
+                          <Button type="submit" size="lg" className="w-full" disabled={isSubmitting}>
+                                {isSubmitting ? <Loader2 className="w-5 h-5 animate-spin mx-auto"/> : 'Gửi thông tin'}
+                          </Button>
                       </form>
                   ) : (
                       <div className="text-center py-12">

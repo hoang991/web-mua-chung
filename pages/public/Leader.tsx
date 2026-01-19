@@ -1,5 +1,6 @@
+
 import React, { useState } from 'react';
-import { CheckCircle, Heart, DollarSign, Users } from 'lucide-react';
+import { CheckCircle, Heart, DollarSign, Users, Loader2 } from 'lucide-react';
 import { Container, Section, Card, Button, Input, Textarea, FadeIn } from '../../components/Shared';
 import { storageService } from '../../services/store';
 
@@ -12,17 +13,48 @@ const Leader = () => {
     location: ''
   });
   const [submitted, setSubmitted] = useState(false);
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    storageService.addSubmission({
-      type: 'leader_registration',
-      name: formState.name,
-      email: formState.email,
-      phone: formState.phone,
-      message: `Location: ${formState.location}\nReason: ${formState.reason}`
-    });
-    setSubmitted(true);
+    setIsSubmitting(true);
+
+    const formData = {
+        form_type: 'leader_registration',
+        name: formState.name,
+        email: formState.email,
+        phone: formState.phone,
+        location: formState.location,
+        reason: formState.reason,
+        _subject: `New Leader Registration: ${formState.name}`
+    };
+
+    try {
+        const response = await fetch('https://formspree.io/f/mwvvovbk', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(formData)
+        });
+
+        if (response.ok) {
+            // Backup to local storage for Admin Panel
+            storageService.addSubmission({
+                type: 'leader_registration',
+                name: formState.name,
+                email: formState.email,
+                phone: formState.phone,
+                message: `Location: ${formState.location}\nReason: ${formState.reason}`
+            });
+            setSubmitted(true);
+        } else {
+            alert("Có lỗi xảy ra khi gửi biểu mẫu. Vui lòng thử lại.");
+        }
+    } catch (error) {
+        console.error("Form error:", error);
+        alert("Lỗi kết nối. Vui lòng kiểm tra đường truyền mạng.");
+    } finally {
+        setIsSubmitting(false);
+    }
   };
 
   return (
@@ -59,6 +91,7 @@ const Leader = () => {
                     required 
                     value={formState.name}
                     onChange={e => setFormState({...formState, name: e.target.value})}
+                    disabled={isSubmitting}
                  />
                  <div className="grid grid-cols-2 gap-4">
                    <Input 
@@ -67,6 +100,7 @@ const Leader = () => {
                       type="tel"
                       value={formState.phone}
                       onChange={e => setFormState({...formState, phone: e.target.value})}
+                      disabled={isSubmitting}
                    />
                    <Input 
                       label="Email" 
@@ -74,6 +108,7 @@ const Leader = () => {
                       required
                       value={formState.email}
                       onChange={e => setFormState({...formState, email: e.target.value})}
+                      disabled={isSubmitting}
                    />
                  </div>
                  <Input 
@@ -81,15 +116,17 @@ const Leader = () => {
                     required
                     value={formState.location}
                     onChange={e => setFormState({...formState, location: e.target.value})}
+                    disabled={isSubmitting}
                  />
                  <Textarea 
                     label="Vì sao bạn quan tâm đến việc mua chung?" 
                     rows={3}
                     value={formState.reason}
                     onChange={e => setFormState({...formState, reason: e.target.value})}
+                    disabled={isSubmitting}
                  />
-                 <Button type="submit" className="w-full py-3 bg-amber-600 hover:bg-amber-700 text-white">
-                   Gửi đăng ký
+                 <Button type="submit" className="w-full py-3 bg-amber-600 hover:bg-amber-700 text-white" disabled={isSubmitting}>
+                   {isSubmitting ? <Loader2 className="w-5 h-5 animate-spin mx-auto"/> : 'Gửi đăng ký'}
                  </Button>
                  <p className="text-xs text-stone-500 text-center mt-2">
                    Chúng tôi sẽ liên hệ lại trong vòng 24h để trao đổi chi tiết.
@@ -101,7 +138,7 @@ const Leader = () => {
                    <CheckCircle className="w-8 h-8 text-green-600" />
                  </div>
                  <h3 className="text-xl font-bold text-stone-900">Đã gửi thành công!</h3>
-                 <p className="text-stone-600 mt-2">Cảm ơn bạn đã quan tâm. Admin sẽ liên hệ sớm.</p>
+                 <p className="text-stone-600 mt-2">Cảm ơn bạn đã quan tâm. Chúng tôi đã nhận được thông tin và sẽ liên hệ sớm.</p>
                </div>
              )}
           </div>
