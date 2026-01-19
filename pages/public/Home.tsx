@@ -63,40 +63,40 @@ const Home = () => {
 
       {/* Hero Section */}
       {heroSection && heroSection.isVisible && (
-        <Section className="relative overflow-hidden bg-stone-50 py-20 lg:py-32">
-          <div className="absolute inset-0 z-0 opacity-10 pointer-events-none">
-             {/* Using primary color for blob */}
-            <div className={`absolute right-0 top-0 -translate-y-1/4 translate-x-1/4 w-[800px] h-[800px] bg-${config.primaryColor}-300 rounded-full blur-3xl`} />
-            <div className="absolute left-0 bottom-0 translate-y-1/4 -translate-x-1/4 w-[600px] h-[600px] bg-yellow-200 rounded-full blur-3xl" />
+        <Section className="relative overflow-hidden bg-stone-50 py-16 md:py-20 lg:py-32">
+          <div className="absolute inset-0 z-0 opacity-10 pointer-events-none overflow-hidden">
+             {/* Optimized Blobs for Mobile */}
+            <div className={`absolute -right-20 top-0 md:top-0 md:-translate-y-1/4 md:translate-x-1/4 w-64 h-64 md:w-[800px] md:h-[800px] bg-${config.primaryColor}-300 rounded-full blur-3xl`} />
+            <div className="absolute -left-20 bottom-0 md:translate-y-1/4 md:-translate-x-1/4 w-48 h-48 md:w-[600px] md:h-[600px] bg-yellow-200 rounded-full blur-3xl" />
           </div>
 
-          <Container className="relative z-10">
-            <div className="max-w-3xl mx-auto text-center space-y-8">
+          <Container className="relative z-10 px-4">
+            <div className="max-w-3xl mx-auto text-center space-y-6 md:space-y-8">
               <FadeIn>
-                <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold text-stone-900 tracking-tight leading-tight">
+                <h1 className="text-3xl md:text-5xl lg:text-6xl font-bold text-stone-900 tracking-tight leading-snug md:leading-tight">
                   {heroSection.title}
                 </h1>
               </FadeIn>
               
               <FadeIn delay={200}>
-                <p className="text-lg md:text-xl text-stone-600 leading-relaxed max-w-2xl mx-auto">
+                <p className="text-base md:text-xl text-stone-600 leading-relaxed max-w-2xl mx-auto">
                   {heroSection.subtitle}
                 </p>
               </FadeIn>
               
               <FadeIn delay={400}>
-                <div className="flex flex-col sm:flex-row items-center justify-center gap-4 pt-4">
+                <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-center gap-3 pt-4">
                   <Link to={heroSection.ctaLink || '/model'}>
-                    <Button size="lg" className="w-full sm:w-auto gap-2">
+                    <Button size="lg" className="w-full sm:w-auto gap-2 py-3.5 md:py-3">
                       {heroSection.ctaText || 'Tìm hiểu ngay'} <ArrowRight className="w-4 h-4" />
                     </Button>
                   </Link>
                   <div className="flex gap-2 w-full sm:w-auto">
                     <Link to="/leader" className="flex-1 sm:flex-none">
-                      <Button variant="outline" size="lg" className="w-full">Dành cho Leader</Button>
+                      <Button variant="outline" size="lg" className="w-full py-3.5 md:py-3 text-center justify-center">Dành cho Leader</Button>
                     </Link>
                     <Link to="/supplier" className="flex-1 sm:flex-none">
-                      <Button variant="ghost" size="lg" className="w-full">NSX</Button>
+                      <Button variant="ghost" size="lg" className="w-full py-3.5 md:py-3 text-center justify-center">NSX</Button>
                     </Link>
                   </div>
                 </div>
@@ -106,8 +106,8 @@ const Home = () => {
             {/* Display Hero Image if exists */}
             {heroSection.image && (
                 <FadeIn delay={600}>
-                    <div className="mt-12 rounded-xl overflow-hidden shadow-2xl border border-stone-100 max-w-4xl mx-auto">
-                        <img src={heroSection.image} alt="Hero" className="w-full h-auto" />
+                    <div className="mt-10 md:mt-12 rounded-xl overflow-hidden shadow-xl md:shadow-2xl border border-stone-100 max-w-4xl mx-auto">
+                        <img src={heroSection.image} alt="Hero" className="w-full h-full object-cover" />
                     </div>
                 </FadeIn>
             )}
@@ -119,22 +119,22 @@ const Home = () => {
       {pillarsSection && pillarsSection.isVisible && (
         <Section className="bg-white">
           <Container>
-            <div className="text-center mb-16">
-              <h2 className="text-3xl font-bold text-stone-900 mb-4">{pillarsSection.title}</h2>
-              <p className="text-stone-600">{pillarsSection.subtitle}</p>
+            <div className="text-center mb-10 md:mb-16">
+              <h2 className="text-2xl md:text-3xl font-bold text-stone-900 mb-4">{pillarsSection.title}</h2>
+              <p className="text-stone-600 px-4">{pillarsSection.subtitle}</p>
             </div>
             
-            <div className="grid md:grid-cols-3 gap-8">
+            <div className="grid md:grid-cols-3 gap-6 md:gap-8">
               {pillarsSection.items?.map((item, idx) => {
                   const { Icon, color, bg } = getPillarIcon(idx);
                   return (
                     <FadeIn key={idx} delay={idx * 100 + 100}>
-                        <Card className={`p-8 h-full border-t-4 ${getBorderColor(idx)} hover:shadow-md transition-shadow`}>
+                        <Card className={`p-6 md:p-8 h-full border-t-4 ${getBorderColor(idx)} hover:shadow-md transition-shadow`}>
                         <div className={`w-12 h-12 ${bg} rounded-lg flex items-center justify-center mb-6`}>
                             <Icon className={`w-6 h-6 ${color}`} />
                         </div>
                         <h3 className="text-xl font-bold mb-3">{item.title}</h3>
-                        <p className="text-stone-600 mb-4">
+                        <p className="text-stone-600 mb-4 text-sm md:text-base">
                             {item.description}
                         </p>
                         </Card>
@@ -150,7 +150,7 @@ const Home = () => {
       {trustSection && trustSection.isVisible && (
         <Section className="bg-stone-50">
           <Container>
-            <div className="grid lg:grid-cols-2 gap-12 lg:gap-20 items-center">
+            <div className="grid lg:grid-cols-2 gap-10 lg:gap-20 items-center">
               <FadeIn>
                 <div className="relative">
                   <div className="aspect-[4/3] bg-stone-200 rounded-2xl overflow-hidden shadow-lg">
@@ -167,11 +167,11 @@ const Home = () => {
                 </div>
               </FadeIn>
 
-              <div className="space-y-8">
+              <div className="space-y-6 md:space-y-8">
                 <div>
-                  <h2 className="text-3xl font-bold text-stone-900 mb-6">{trustSection.title}</h2>
+                  <h2 className="text-2xl md:text-3xl font-bold text-stone-900 mb-4 md:mb-6">{trustSection.title}</h2>
                   {trustSection.subtitle && <p className={`${primaryText} font-medium mb-4`}>{trustSection.subtitle}</p>}
-                  <p className="text-stone-600 leading-relaxed whitespace-pre-wrap">
+                  <p className="text-stone-600 leading-relaxed whitespace-pre-wrap text-sm md:text-base">
                     {trustSection.content}
                   </p>
                 </div>
@@ -187,8 +187,8 @@ const Home = () => {
                     </div>
                   ))}
                 </div>
-                <Link to="/model">
-                  <Button variant="outline">Xem chi tiết mô hình</Button>
+                <Link to="/model" className="block w-full sm:w-auto">
+                  <Button variant="outline" className="w-full sm:w-auto justify-center">Xem chi tiết mô hình</Button>
                 </Link>
               </div>
             </div>

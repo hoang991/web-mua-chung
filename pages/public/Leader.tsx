@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { CheckCircle, Heart, DollarSign, Users, Loader2 } from 'lucide-react';
 import { Container, Section, Card, Button, Input, Textarea, FadeIn } from '../../components/Shared';

@@ -4,25 +4,48 @@
     <meta charset="UTF-8" />
     <link rel="icon" type="image/svg+xml" href="https://lucide.dev/favicon.ico" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <meta name="description" content="Nền tảng Mua Chung Tử Tế" />
-    <title>Mua Chung Tử Tế</title>
+    <meta name="theme-color" content="#059669" />
+    <title>Mua Chung Tử Tế - Cộng đồng tiêu dùng thông minh</title>
+    
+    <!-- SEO Meta Tags -->
+    <meta name="description" content="Nền tảng mua chung tử tế, kết nối trực tiếp Nhà sản xuất và Cộng đồng. Minh bạch, an tâm, giá gốc." />
+    <meta name="keywords" content="mua chung, nông sản sạch, pre-order, cộng đồng tử tế" />
+    <meta name="author" content="Mua Chung Tử Tế" />
+
+    <!-- Open Graph / Facebook / Zalo -->
+    <meta property="og:type" content="website" />
+    <meta property="og:url" content="https://muachungtute.vn/" />
+    <meta property="og:title" content="Mua Chung Tử Tế - Cộng đồng tiêu dùng thông minh" />
+    <meta property="og:description" content="Kết nối trực tiếp từ Nhà sản xuất tận tâm đến Cộng đồng. Không bán lẻ, không đa cấp, chỉ có sự tử tế." />
+    <meta property="og:image" content="https://picsum.photos/1200/630" />
+
+    <!-- Twitter -->
+    <meta property="twitter:card" content="summary_large_image" />
+    <meta property="twitter:url" content="https://muachungtute.vn/" />
+    <meta property="twitter:title" content="Mua Chung Tử Tế" />
+    <meta property="twitter:description" content="Nền tảng cộng đồng, social commerce tập trung vào sự tử tế." />
+    <meta property="twitter:image" content="https://picsum.photos/1200/630" />
+
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
     <style>
-      body {
-        font-family: 'Inter', sans-serif;
-      }
+      body { font-family: 'Inter', sans-serif; }
+      /* Custom Scrollbar for nicer look */
+      ::-webkit-scrollbar { width: 8px; }
+      ::-webkit-scrollbar-track { background: #f1f1f1; }
+      ::-webkit-scrollbar-thumb { background: #d1d5db; border-radius: 4px; }
+      ::-webkit-scrollbar-thumb:hover { background: #9ca3af; }
     </style>
   <script type="importmap">
 {
   "imports": {
-    "react-router-dom": "https://esm.sh/react-router-dom@^7.12.0",
-    "tailwind-merge": "https://esm.sh/tailwind-merge@^3.4.0",
-    "clsx": "https://esm.sh/clsx@^2.1.1",
     "react/": "https://esm.sh/react@^19.2.3/",
     "react": "https://esm.sh/react@^19.2.3",
-    "react-dom/": "https://esm.sh/react-dom@^19.2.3/",
     "lucide-react": "https://esm.sh/lucide-react@^0.562.0",
+    "react-router-dom": "https://esm.sh/react-router-dom@^7.12.0",
+    "react-dom/": "https://esm.sh/react-dom@^19.2.3/",
+    "clsx": "https://esm.sh/clsx@^2.1.1",
+    "tailwind-merge": "https://esm.sh/tailwind-merge@^3.4.0",
     "react-helmet": "https://esm.sh/react-helmet@^6.1.0"
   }
 }
@@ -30,5 +53,7 @@
 </head>
   <body>
     <div id="root"></div>
+    <!-- CRITICAL: Entry point for Vite/React -->
+    <script type="module" src="/index.tsx"></script>
   </body>
 </html>

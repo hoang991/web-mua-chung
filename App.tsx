@@ -1,23 +1,37 @@
-import React, { useEffect, useState } from 'react';
-import { HashRouter as Router, Routes, Route, Navigate, useLocation } from 'react-router-dom';
+import React, { useEffect, useState, Suspense } from 'react';
+import { HashRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 import { PublicLayout, AdminLayout } from './components/Layout';
 import { SEOHead } from './components/SEO';
-import Home from './pages/public/Home';
-import Model from './pages/public/Model';
-import Leader from './pages/public/Leader';
-import Products from './pages/public/Products';
-import Supplier from './pages/public/Supplier';
-import Contact from './pages/public/Contact';
-import Privacy from './pages/public/Privacy';
-import Terms from './pages/public/Terms';
-import { DashboardHome, SubmissionsPage, SettingsPage } from './pages/admin/Dashboard';
-import { ContentManager } from './pages/admin/ContentManager';
-import { MediaLibrary } from './pages/admin/MediaLibrary';
-import { ThemeCustomizer } from './pages/admin/ThemeCustomizer';
-import { ProductManager } from './pages/admin/ProductManager';
-import { SupplierManager } from './pages/admin/SupplierManager';
 import { storageService } from './services/store';
 import { Button, Input, Card } from './components/Shared';
+import { Loader2 } from 'lucide-react';
+
+// Lazy load pages for better performance
+const Home = React.lazy(() => import('./pages/public/Home'));
+const Model = React.lazy(() => import('./pages/public/Model'));
+const Leader = React.lazy(() => import('./pages/public/Leader'));
+const Products = React.lazy(() => import('./pages/public/Products'));
+const Supplier = React.lazy(() => import('./pages/public/Supplier'));
+const Contact = React.lazy(() => import('./pages/public/Contact'));
+const Privacy = React.lazy(() => import('./pages/public/Privacy'));
+const Terms = React.lazy(() => import('./pages/public/Terms'));
+
+// Admin Pages Lazy Load
+const DashboardHome = React.lazy(() => import('./pages/admin/Dashboard').then(module => ({ default: module.DashboardHome })));
+const SubmissionsPage = React.lazy(() => import('./pages/admin/Dashboard').then(module => ({ default: module.SubmissionsPage })));
+const SettingsPage = React.lazy(() => import('./pages/admin/Dashboard').then(module => ({ default: module.SettingsPage })));
+const ContentManager = React.lazy(() => import('./pages/admin/ContentManager').then(module => ({ default: module.ContentManager })));
+const MediaLibrary = React.lazy(() => import('./pages/admin/MediaLibrary').then(module => ({ default: module.MediaLibrary })));
+const ThemeCustomizer = React.lazy(() => import('./pages/admin/ThemeCustomizer').then(module => ({ default: module.ThemeCustomizer })));
+const ProductManager = React.lazy(() => import('./pages/admin/ProductManager').then(module => ({ default: module.ProductManager })));
+const SupplierManager = React.lazy(() => import('./pages/admin/SupplierManager').then(module => ({ default: module.SupplierManager })));
+
+// Loading Component
+const PageLoader = () => (
+  <div className="min-h-[60vh] flex items-center justify-center">
+    <Loader2 className="w-8 h-8 text-emerald-600 animate-spin" />
+  </div>
+);
 
 // Simple Login Page for Admin
 const LoginPage = () => {
@@ -77,31 +91,32 @@ const App = () => {
   return (
     <Router>
       <GlobalSEO />
-      <Routes>
-        {/* Public Routes */}
-        <Route path="/" element={<PublicLayout><Home /></PublicLayout>} />
-        <Route path="/model" element={<PublicLayout><Model /></PublicLayout>} />
-        <Route path="/leader" element={<PublicLayout><Leader /></PublicLayout>} />
-        <Route path="/products" element={<PublicLayout><Products /></PublicLayout>} />
-        <Route path="/supplier" element={<PublicLayout><Supplier /></PublicLayout>} />
-        <Route path="/philosophy" element={<PublicLayout><PlaceholderPage title="Triết lý & Văn hóa" /></PublicLayout>} />
-        
-        {/* New Pages */}
-        <Route path="/contact" element={<PublicLayout><Contact /></PublicLayout>} />
-        <Route path="/privacy" element={<PublicLayout><Privacy /></PublicLayout>} />
-        <Route path="/terms" element={<PublicLayout><Terms /></PublicLayout>} />
+      <Suspense fallback={<PublicLayout><PageLoader /></PublicLayout>}>
+        <Routes>
+          {/* Public Routes */}
+          <Route path="/" element={<PublicLayout><Home /></PublicLayout>} />
+          <Route path="/model" element={<PublicLayout><Model /></PublicLayout>} />
+          <Route path="/leader" element={<PublicLayout><Leader /></PublicLayout>} />
+          <Route path="/products" element={<PublicLayout><Products /></PublicLayout>} />
+          <Route path="/supplier" element={<PublicLayout><Supplier /></PublicLayout>} />
+          <Route path="/philosophy" element={<PublicLayout><PlaceholderPage title="Triết lý & Văn hóa" /></PublicLayout>} />
+          
+          <Route path="/contact" element={<PublicLayout><Contact /></PublicLayout>} />
+          <Route path="/privacy" element={<PublicLayout><Privacy /></PublicLayout>} />
+          <Route path="/terms" element={<PublicLayout><Terms /></PublicLayout>} />
 
-        {/* Admin Routes */}
-        <Route path="/admin/login" element={<LoginPage />} />
-        <Route path="/admin" element={<ProtectedRoute><DashboardHome /></ProtectedRoute>} />
-        <Route path="/admin/submissions" element={<ProtectedRoute><SubmissionsPage /></ProtectedRoute>} />
-        <Route path="/admin/products" element={<ProtectedRoute><ProductManager /></ProtectedRoute>} />
-        <Route path="/admin/suppliers" element={<ProtectedRoute><SupplierManager /></ProtectedRoute>} />
-        <Route path="/admin/pages" element={<ProtectedRoute><ContentManager /></ProtectedRoute>} />
-        <Route path="/admin/media" element={<ProtectedRoute><MediaLibrary /></ProtectedRoute>} />
-        <Route path="/admin/theme" element={<ProtectedRoute><ThemeCustomizer /></ProtectedRoute>} />
-        <Route path="/admin/settings" element={<ProtectedRoute><SettingsPage /></ProtectedRoute>} />
-      </Routes>
+          {/* Admin Routes */}
+          <Route path="/admin/login" element={<LoginPage />} />
+          <Route path="/admin" element={<ProtectedRoute><DashboardHome /></ProtectedRoute>} />
+          <Route path="/admin/submissions" element={<ProtectedRoute><SubmissionsPage /></ProtectedRoute>} />
+          <Route path="/admin/products" element={<ProtectedRoute><ProductManager /></ProtectedRoute>} />
+          <Route path="/admin/suppliers" element={<ProtectedRoute><SupplierManager /></ProtectedRoute>} />
+          <Route path="/admin/pages" element={<ProtectedRoute><ContentManager /></ProtectedRoute>} />
+          <Route path="/admin/media" element={<ProtectedRoute><MediaLibrary /></ProtectedRoute>} />
+          <Route path="/admin/theme" element={<ProtectedRoute><ThemeCustomizer /></ProtectedRoute>} />
+          <Route path="/admin/settings" element={<ProtectedRoute><SettingsPage /></ProtectedRoute>} />
+        </Routes>
+      </Suspense>
     </Router>
   );
 };
