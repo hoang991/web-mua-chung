@@ -1,19 +1,42 @@
 
 import React, { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
-import { ArrowRight, Users, Heart, ShieldCheck, Leaf } from 'lucide-react';
+import { ArrowRight, Users, Heart, ShieldCheck, Leaf, Calendar, MapPin, Clock } from 'lucide-react';
 import { Container, Section, Button, FadeIn, Card, cn } from '../../components/Shared';
 import { SEOHead } from '../../components/SEO';
 import { storageService } from '../../services/store';
-import { PageData, SectionContent } from '../../types';
+import { PageData, SectionContent, BlogPost } from '../../types';
 
 const Home = () => {
   const [pageData, setPageData] = useState<PageData | undefined>();
   const [config] = useState(storageService.getConfig());
+  
+  // State cho nội dung động
+  const [upcomingEvents, setUpcomingEvents] = useState<BlogPost[]>([]);
+  const [latestStories, setLatestStories] = useState<BlogPost[]>([]);
 
   useEffect(() => {
+    // 1. Get Static Page Data
     const data = storageService.getPage('home');
     setPageData(data);
+
+    // 2. Get Dynamic Blog/Event Data
+    const allPosts = storageService.getBlogPosts().filter(p => p.status === 'published');
+
+    // Filter Events: Sort by date (nearest future date first, then past dates)
+    const events = allPosts.filter(p => p.category === 'event');
+    events.sort((a, b) => {
+        const dateA = a.eventDate ? new Date(a.eventDate).getTime() : new Date(a.createdAt).getTime();
+        const dateB = b.eventDate ? new Date(b.eventDate).getTime() : new Date(b.createdAt).getTime();
+        return dateB - dateA; // Show latest first for now
+    });
+    setUpcomingEvents(events.slice(0, 3)); // Take top 3
+
+    // Filter Stories (Non-events)
+    const stories = allPosts.filter(p => p.category !== 'event');
+    stories.sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
+    setLatestStories(stories.slice(0, 3)); // Take top 3
+
   }, []);
 
   if (!pageData) return null; 
@@ -146,9 +169,69 @@ const Home = () => {
         </Section>
       )}
 
+      {/* NEW SECTION: Sự kiện sắp tới (Events) */}
+      {upcomingEvents.length > 0 && (
+          <Section className="bg-amber-50 relative overflow-hidden">
+             <div className="absolute top-0 right-0 w-64 h-64 bg-amber-100 rounded-full blur-3xl -translate-y-1/2 translate-x-1/2 opacity-50 pointer-events-none"></div>
+             <Container className="relative z-10">
+                <div className="flex flex-col md:flex-row justify-between items-center mb-10 gap-4">
+                    <div className="text-center md:text-left">
+                        <h2 className="text-2xl md:text-3xl font-bold text-stone-900 mb-2">Lịch Sự Kiện Cộng Đồng</h2>
+                        <p className="text-stone-600">Những buổi gặp gỡ, chia sẻ và kết nối sắp diễn ra.</p>
+                    </div>
+                    <Link to="/blog">
+                        <Button variant="outline" className="border-amber-600 text-amber-700 hover:bg-amber-100">
+                             Xem tất cả sự kiện <ArrowRight className="w-4 h-4 ml-2"/>
+                        </Button>
+                    </Link>
+                </div>
+
+                <div className="grid md:grid-cols-3 gap-6">
+                    {upcomingEvents.map((evt, idx) => {
+                        const date = evt.eventDate ? new Date(evt.eventDate) : new Date(evt.createdAt);
+                        return (
+                            <FadeIn key={evt.id} delay={idx * 100}>
+                                <Link to={`/blog/${evt.slug}`} className="block h-full group">
+                                    <div className="bg-white rounded-xl overflow-hidden shadow-sm hover:shadow-md transition-all border border-amber-100 h-full flex flex-col">
+                                        <div className="h-2 bg-amber-500 w-full"></div>
+                                        <div className="p-6 flex-1 flex flex-col">
+                                            <div className="flex gap-4 mb-4">
+                                                <div className="flex flex-col items-center justify-center bg-amber-50 border border-amber-200 rounded-lg w-16 h-16 shrink-0 text-amber-700">
+                                                    <span className="text-xs font-bold uppercase">{date.toLocaleString('vi-VN', { month: 'short' })}</span>
+                                                    <span className="text-2xl font-bold">{date.getDate()}</span>
+                                                </div>
+                                                <div>
+                                                     <h3 className="font-bold text-lg text-stone-900 group-hover:text-amber-700 transition-colors line-clamp-2 leading-tight">
+                                                        {evt.title}
+                                                    </h3>
+                                                    {evt.location && (
+                                                        <div className="flex items-center gap-1 text-xs text-stone-500 mt-2">
+                                                            <MapPin className="w-3 h-3"/>
+                                                            <span className="line-clamp-1">{evt.location.address}</span>
+                                                        </div>
+                                                    )}
+                                                </div>
+                                            </div>
+                                            <p className="text-sm text-stone-600 line-clamp-2 mb-4 flex-1">
+                                                {evt.excerpt}
+                                            </p>
+                                            <div className="text-amber-600 text-sm font-bold flex items-center group-hover:translate-x-1 transition-transform mt-auto">
+                                                Đăng ký tham gia <ArrowRight className="w-4 h-4 ml-1"/>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </Link>
+                            </FadeIn>
+                        );
+                    })}
+                </div>
+             </Container>
+          </Section>
+      )}
+
       {/* Trust & Different */}
       {trustSection && trustSection.isVisible && (
-        <Section className="bg-stone-50">
+        <Section className="bg-white">
           <Container>
             <div className="grid lg:grid-cols-2 gap-10 lg:gap-20 items-center">
               <FadeIn>
@@ -194,6 +277,63 @@ const Home = () => {
             </div>
           </Container>
         </Section>
+      )}
+
+      {/* NEW SECTION: Dưỡng Vườn Tâm (Blog) */}
+      {latestStories.length > 0 && (
+          <Section className="bg-stone-50">
+              <Container>
+                  <div className="text-center mb-12">
+                      <h2 className="text-3xl font-bold text-stone-900 mb-4 font-serif">Dưỡng Vườn Tâm</h2>
+                      <p className="text-stone-600 max-w-2xl mx-auto">
+                          Góc nhỏ để chúng ta cùng nhau chia sẻ về lối sống xanh, những câu chuyện tử tế và cách nuôi dưỡng bình an trong tâm hồn.
+                      </p>
+                  </div>
+
+                  <div className="grid md:grid-cols-3 gap-8">
+                      {latestStories.map((post, idx) => (
+                          <FadeIn key={post.id} delay={idx * 100}>
+                              <Card className="h-full flex flex-col hover:shadow-lg transition-all duration-300 group border-stone-200">
+                                  <Link to={`/blog/${post.slug}`} className="block relative aspect-[16/9] overflow-hidden bg-stone-200 rounded-t-xl">
+                                      <img 
+                                          src={post.coverImage || `https://picsum.photos/800/600?random=${idx}`} 
+                                          alt={post.title}
+                                          className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105" 
+                                      />
+                                      <div className="absolute top-4 left-4 bg-white/90 backdrop-blur-sm px-3 py-1 rounded-full text-xs font-bold text-stone-700 shadow-sm">
+                                          {post.category === 'tea' ? 'Điểm trà' : post.category === 'solution' ? 'Giải pháp' : 'Câu chuyện'}
+                                      </div>
+                                  </Link>
+                                  <div className="p-6 flex flex-col flex-1">
+                                      <div className="flex items-center gap-2 text-xs text-stone-500 mb-3">
+                                          <Calendar className="w-3 h-3" />
+                                          {new Date(post.createdAt).toLocaleDateString()}
+                                      </div>
+                                      
+                                      <h3 className="text-lg font-bold text-stone-900 mb-3 group-hover:text-emerald-700 transition-colors line-clamp-2">
+                                          <Link to={`/blog/${post.slug}`}>{post.title}</Link>
+                                      </h3>
+
+                                      <p className="text-stone-600 text-sm leading-relaxed mb-4 line-clamp-3 flex-1">
+                                          {post.excerpt}
+                                      </p>
+
+                                      <Link to={`/blog/${post.slug}`} className="flex items-center text-sm font-medium text-emerald-700 mt-auto hover:underline">
+                                          Đọc tiếp <ArrowRight className="w-4 h-4 ml-1" />
+                                      </Link>
+                                  </div>
+                              </Card>
+                          </FadeIn>
+                      ))}
+                  </div>
+
+                  <div className="text-center mt-10">
+                      <Link to="/blog">
+                          <Button variant="outline" size="lg" className="px-8">Vào vườn tham quan</Button>
+                      </Link>
+                  </div>
+              </Container>
+          </Section>
       )}
     </>
   );
