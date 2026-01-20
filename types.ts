@@ -1,4 +1,5 @@
 
+
 export type ThemeColor = 'emerald' | 'blue' | 'rose' | 'amber' | 'slate' | 'violet';
 export type ThemeFont = 'inter' | 'serif' | 'mono';
 
@@ -71,6 +72,8 @@ export interface PageData {
   updatedAt: string;
 }
 
+export type BlogCategory = 'solution' | 'story' | 'event' | 'tea';
+
 export interface BlogPost {
   id: string;
   slug: string;
@@ -78,9 +81,20 @@ export interface BlogPost {
   excerpt: string;
   content: string; // HTML or Markdown
   coverImage?: string;
+  category: BlogCategory;
   status: 'draft' | 'published';
   createdAt: string;
   updatedAt: string;
+  // New Location Data for 'tea' category
+  location?: {
+      address: string;
+      link?: string; // Google Maps Link
+      // Legacy support (optional)
+      lat?: number;
+      lng?: number;
+  };
+  // New Event Date for 'event' category
+  eventDate?: string; // ISO Date String
 }
 
 // New Types for Product & Supplier
@@ -126,19 +140,20 @@ export interface FormSubmission {
 }
 
 export const DEFAULT_CONFIG: SiteConfig = {
-  siteName: "Mua Chung Tử Tế",
-  contactEmail: "lienhe@muachungtute.vn",
+  siteName: "Alo Mua Chung",
+  contactEmail: "lienhe@alomuachung.vn",
   contactPhone: "0909.888.999",
   primaryColor: "emerald",
   font: "inter",
-  seoTitle: "Cộng Đồng Mua Chung Tử Tế - An Tâm & Minh Bạch",
-  seoDescription: "Nền tảng kết nối người dùng, Leader và Nhà sản xuất tử tế. Không bán lẻ, không đa cấp.",
+  seoTitle: "Alo Mua Chung - Cộng Đồng Tiêu Dùng Thông Minh",
+  seoDescription: "Nền tảng kết nối người dùng, Trưởng Nhóm Khu Vực và Nhà sản xuất tử tế. Không bán lẻ, không đa cấp.",
   socialLinks: {},
   aiKeys: {},
   mainMenu: [
     { id: '1', name: 'Về chúng tôi', path: '/', isVisible: true, order: 1 },
     { id: '2', name: 'Mô hình', path: '/model', isVisible: true, order: 2 },
-    { id: '3', name: 'Leader', path: '/leader', isVisible: true, order: 3 },
-    { id: '4', name: 'Sản phẩm', path: '/products', isVisible: true, order: 4 },
+    { id: '3', name: 'Trưởng Nhóm KV', path: '/leader', isVisible: true, order: 3 },
+    { id: '4', name: 'Vườn giải pháp', path: '/products', isVisible: true, order: 4 },
+    { id: '5', name: 'Dưỡng vườn tâm', path: '/blog', isVisible: true, order: 5 },
   ]
 };

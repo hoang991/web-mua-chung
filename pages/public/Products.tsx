@@ -43,10 +43,10 @@ const Products = () => {
       <Section className="bg-stone-50 py-12">
         <Container>
           <div className="text-center mb-12">
-            <h1 className="text-3xl md:text-4xl font-bold text-stone-900 mb-4">Sản phẩm kỳ này</h1>
+            <h1 className="text-3xl md:text-4xl font-bold text-stone-900 mb-4">Vườn giải pháp kỳ này</h1>
             <p className="text-stone-600 max-w-2xl mx-auto text-sm md:text-base">
-              Các sản phẩm được tuyển chọn kỹ lưỡng từ những nhà sản xuất uy tín. 
-              Đặt trước (Pre-order) để có giá tốt nhất và sản phẩm mới nhất.
+              Các giải pháp được tuyển chọn kỹ lưỡng từ những nhà sản xuất uy tín. 
+              Đặt trước (Pre-order) để có giá tốt nhất và nhận được những giải pháp mới nhất.
             </p>
           </div>
 
@@ -196,7 +196,7 @@ const Products = () => {
 
                           <div className="bg-blue-50 p-4 md:p-5 rounded-xl text-sm text-blue-900 border border-blue-100 mb-8 md:mb-0">
                                 <p className="font-bold mb-2 flex items-center gap-2"><ShoppingCart className="w-4 h-4"/> Cách thức đặt hàng:</p>
-                                <p>Vui lòng liên hệ Leader khu vực của bạn hoặc để lại thông tin để chúng tôi kết nối Leader gần nhất.</p>
+                                <p>Vui lòng liên hệ Trưởng Nhóm Khu Vực của bạn hoặc để lại thông tin để chúng tôi kết nối Trưởng Nhóm gần nhất.</p>
                           </div>
                       </div>
                       

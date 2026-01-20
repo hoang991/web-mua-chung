@@ -9,7 +9,8 @@ const STORAGE_KEYS = {
   PAGES: 'mctt_pages',
   MEDIA: 'mctt_media',
   PRODUCTS: 'mctt_products',
-  SUPPLIER_POSTS: 'mctt_supplier_posts'
+  SUPPLIER_POSTS: 'mctt_supplier_posts',
+  BLOG_POSTS: 'mctt_blog_posts' // New key for Dưỡng vườn tâm
 };
 
 // Helper for safe parsing to prevent white-screen crashes
@@ -30,14 +31,14 @@ const INITIAL_PAGES: PageData[] = [
     title: 'Trang Chủ',
     status: 'published',
     updatedAt: new Date().toISOString(),
-    metaTitle: 'Trang Chủ - Mua Chung Tử Tế',
+    metaTitle: 'Trang Chủ - Alo Mua Chung',
     metaDescription: 'Nền tảng mua chung tử tế, kết nối trực tiếp NSX và người dùng.',
     sections: [
       {
         id: 'hero',
         type: 'hero',
         title: 'Chúng tôi không bán hàng – chúng tôi tổ chức mua chung tử tế.',
-        subtitle: 'Kết nối trực tiếp từ Nhà sản xuất tận tâm đến Cộng đồng thông qua những Leader địa phương.',
+        subtitle: 'Kết nối trực tiếp từ Nhà sản xuất tận tâm đến Cộng đồng thông qua những Trưởng Nhóm Khu Vực địa phương.',
         ctaText: 'Tìm hiểu cách hoạt động',
         ctaLink: '/model',
         isVisible: true,
@@ -53,10 +54,10 @@ const INITIAL_PAGES: PageData[] = [
         items: [
             {
                 title: "Người Dùng",
-                description: "Mua sản phẩm tốt với giá \"gốc\" nhờ sức mạnh tập thể. An tâm tuyệt đối về nguồn gốc vì Leader đã kiểm chứng."
+                description: "Sở hữu giải pháp/sản phẩm tốt với giá \"gốc\" nhờ sức mạnh tập thể. An tâm tuyệt đối về nguồn gốc vì Trưởng Nhóm đã kiểm chứng."
             },
             {
-                title: "Leader Cộng Đồng",
+                title: "Trưởng Nhóm Khu Vực",
                 description: "Có thêm thu nhập xứng đáng từ việc chăm sóc cộng đồng. Xây dựng uy tín cá nhân và mang lại giá trị thực."
             },
             {
@@ -69,13 +70,13 @@ const INITIAL_PAGES: PageData[] = [
         id: 'trust',
         type: 'image-text',
         title: 'Khác biệt để bền vững',
-        content: 'Chúng tôi gom đơn định kỳ để tối ưu vận chuyển. Chỉ có 1 tầng Leader duy nhất. Chia sẻ giá trị sản phẩm thực.',
+        content: 'Chúng tôi gom đơn định kỳ để tối ưu vận chuyển. Chỉ có 1 tầng Trưởng Nhóm duy nhất. Chia sẻ giá trị giải pháp thực.',
         image: 'https://picsum.photos/800/600?grayscale',
         isVisible: true,
         order: 3,
         items: [
             { title: "Không bán lẻ", description: "Gom đơn để tối ưu chi phí" },
-            { title: "Không đa cấp", description: "Chỉ 1 tầng Leader duy nhất" },
+            { title: "Không đa cấp", description: "Chỉ 1 tầng Trưởng Nhóm duy nhất" },
             { title: "Minh bạch 100%", description: "Về nguồn gốc và giá thành" }
         ]
       }
@@ -92,21 +93,21 @@ const INITIAL_PAGES: PageData[] = [
         id: 'timeline', 
         type: 'timeline', 
         title: 'Quy trình 30 ngày', 
-        subtitle: 'Để đảm bảo giá tốt nhất và hàng mới nhất, chúng tôi không bán sẵn. Mọi thứ hoạt động theo lịch trình chính xác.',
+        subtitle: 'Để đảm bảo giá tốt nhất và giải pháp mới nhất, chúng tôi không bán sẵn. Mọi thứ hoạt động theo lịch trình chính xác.',
         isVisible: true, 
         order: 2,
         items: [
-          { label: "Ngày 1-10", title: "Mở cổng đăng ký (Pre-order)", description: "Cộng đồng đặt hàng thông qua Leader. Leader tổng hợp số lượng." },
-          { label: "Ngày 11-15", title: "Chốt đơn & Sản xuất", description: "NSX nhận số liệu chính xác và bắt đầu đóng gói/sản xuất để đảm bảo độ tươi mới." },
-          { label: "Ngày 16-25", title: "Vận chuyển tập trung", description: "Hàng được chuyển về kho tổng và phân phối đến địa điểm của từng Leader." },
-          { label: "Ngày 26-30", title: "Trả hàng & Chăm sóc", description: "Khách hàng nhận hàng tại điểm Leader hoặc được ship. Leader hướng dẫn sử dụng." }
+          { label: "Ngày 1-10", title: "Mở cổng đăng ký (Pre-order)", description: "Cộng đồng đặt giải pháp thông qua Trưởng Nhóm. Trưởng Nhóm tổng hợp số lượng." },
+          { label: "Ngày 11-15", title: "Chốt đơn & Sản xuất", description: "NSX nhận số liệu chính xác và bắt đầu đóng gói/sản xuất để đảm bảo chất lượng tốt nhất." },
+          { label: "Ngày 16-25", title: "Vận chuyển tập trung", description: "Hàng được chuyển về kho tổng và phân phối đến địa điểm của từng Trưởng Nhóm." },
+          { label: "Ngày 26-30", title: "Trả hàng & Chăm sóc", description: "Khách hàng nhận giải pháp tại điểm Trưởng Nhóm hoặc được ship. Trưởng Nhóm hướng dẫn sử dụng." }
         ]
       }
     ]
   },
   {
     slug: 'leader',
-    title: 'Dành cho Leader',
+    title: 'Dành cho Trưởng Nhóm',
     status: 'published',
     updatedAt: new Date().toISOString(),
     sections: [
@@ -126,13 +127,10 @@ const INITIAL_PAGES: PageData[] = [
         title: 'Chính sách bảo mật thông tin', 
         content: `
 <h3>1. Mục đích và phạm vi thu thập</h3>
-<p>Để truy cập và sử dụng một số dịch vụ tại Mua Chung Tử Tế, bạn có thể sẽ được yêu cầu đăng ký với chúng tôi thông tin cá nhân (Email, Họ tên, Số ĐT liên lạc...). Mọi thông tin khai báo phải đảm bảo tính chính xác và hợp pháp. Chúng tôi không chịu mọi trách nhiệm liên quan đến pháp luật của thông tin khai báo.</p>
+<p>Để truy cập và sử dụng một số dịch vụ tại Alo Mua Chung, bạn có thể sẽ được yêu cầu đăng ký với chúng tôi thông tin cá nhân (Email, Họ tên, Số ĐT liên lạc...). Mọi thông tin khai báo phải đảm bảo tính chính xác và hợp pháp.</p>
 
 <h3>2. Phạm vi sử dụng thông tin</h3>
-<p>Mua Chung Tử Tế thu thập và sử dụng thông tin cá nhân quý khách với mục đích phù hợp và hoàn toàn tuân thủ nội dung của "Chính sách bảo mật" này. Khi cần thiết, chúng tôi có thể sử dụng những thông tin này để liên hệ trực tiếp với bạn dưới các hình thức như: gởi thư ngỏ, đơn đặt hàng, thư cảm ơn, sms, thông tin về kỹ thuật và bảo mật.</p>
-
-<h3>3. Thời gian lưu trữ thông tin</h3>
-<p>Dữ liệu cá nhân của Thành viên sẽ được lưu trữ cho đến khi có yêu cầu hủy bỏ. Còn lại trong mọi trường hợp thông tin cá nhân thành viên sẽ được bảo mật trên máy chủ của Mua Chung Tử Tế.</p>
+<p>Alo Mua Chung thu thập và sử dụng thông tin cá nhân quý khách với mục đích phù hợp và hoàn toàn tuân thủ nội dung của "Chính sách bảo mật" này.</p>
         `,
         isVisible: true, 
         order: 1 
@@ -153,13 +151,9 @@ const INITIAL_PAGES: PageData[] = [
 <h3>1. Hướng dẫn sử dụng website</h3>
 <ul>
 <li>Người dùng phải đủ 18 tuổi hoặc truy cập dưới sự giám sát của cha mẹ hay người giám hộ hợp pháp.</li>
-<li>Chúng tôi cấp giấy phép sử dụng để bạn có thể mua sắm trên web trong khuôn khổ Điều khoản và Điều kiện sử dụng đã đề ra.</li>
 </ul>
 
-<h3>2. Ý kiến khách hàng</h3>
-<p>Tất cả nội dung trang web và ý kiến phê bình của quý khách đều là tài sản của chúng tôi. Nếu chúng tôi phát hiện bất kỳ thông tin giả mạo nào, chúng tôi sẽ khóa tài khoản của quý khách ngay lập tức.</p>
-
-<h3>3. Chính sách Pre-order</h3>
+<h3>2. Chính sách Pre-order</h3>
 <p>Mô hình của chúng tôi hoạt động dựa trên nguyên tắc gom đơn (mua chung). Do đó, thời gian nhận hàng có thể lâu hơn so với thương mại điện tử thông thường.</p>
         `,
         isVisible: true, 
@@ -185,6 +179,55 @@ const INITIAL_PRODUCTS: Product[] = [
         ],
         category: 'Nông sản',
         status: 'active',
+        updatedAt: new Date().toISOString()
+    }
+];
+
+// Initial Blog Posts
+const INITIAL_BLOG_POSTS: BlogPost[] = [
+    {
+        id: 'b1',
+        slug: 'song-cham-de-yeu-thuong',
+        title: 'Sống chậm để yêu thương nhiều hơn',
+        excerpt: 'Trong guồng quay hối hả của cuộc sống hiện đại, đôi khi chúng ta cần một khoảng lặng để nhìn lại...',
+        content: `
+<p>Chúng ta đang sống trong một thế giới mà mọi thứ đều diễn ra quá nhanh. Ăn nhanh, uống nhanh, và thậm chí là yêu thương cũng vội vàng. Nhưng liệu sự nhanh chóng đó có thực sự mang lại hạnh phúc?</p>
+<p>Dưỡng vườn tâm là nơi chúng ta cùng nhau chia sẻ những câu chuyện về sự tử tế, về lối sống xanh và cách để tìm lại sự cân bằng trong tâm hồn.</p>
+        `,
+        coverImage: 'https://picsum.photos/800/400?grayscale',
+        status: 'published',
+        category: 'tea',
+        createdAt: new Date().toISOString(),
+        updatedAt: new Date().toISOString()
+    },
+    {
+        id: 'b2',
+        slug: 'su-tu-te-trong-tieu-dung',
+        title: 'Sự tử tế trong tiêu dùng: Bắt đầu từ đâu?',
+        excerpt: 'Tiêu dùng không chỉ là mua sắm, đó là lá phiếu bạn bầu chọn cho thế giới bạn muốn sống.',
+        content: `
+<p>Mỗi lần bạn bỏ tiền ra mua một món hàng, bạn đang ủng hộ cho quy trình sản xuất ra nó. Tại Alo Mua Chung, chúng tôi tin rằng sự tử tế bắt đầu từ việc minh bạch nguồn gốc và chia sẻ lợi ích công bằng với người nông dân.</p>
+        `,
+        coverImage: 'https://picsum.photos/800/401?grayscale',
+        status: 'published',
+        category: 'solution',
+        createdAt: new Date(Date.now() - 86400000).toISOString(),
+        updatedAt: new Date().toISOString()
+    },
+    {
+        id: 'b3',
+        slug: 'buoi-gap-go-chi-em',
+        title: 'Họp mặt chị em cuối tuần: Chia sẻ chuyện bếp núc',
+        excerpt: 'Thân mời các chị em tham gia buổi trà chiều chia sẻ về các công thức nấu ăn ngon và lành mạnh.',
+        content: `
+<p>Thời gian: 15:00 Thứ 7 tuần này.</p>
+<p>Địa điểm: Nhà cộng đồng.</p>
+<p>Nội dung: Hướng dẫn làm sữa hạt tại nhà.</p>
+        `,
+        coverImage: 'https://picsum.photos/800/402?grayscale',
+        status: 'published',
+        category: 'event',
+        createdAt: new Date(Date.now() - 172800000).toISOString(),
         updatedAt: new Date().toISOString()
     }
 ];
@@ -245,7 +288,7 @@ export const storageService = {
      localStorage.setItem(STORAGE_KEYS.PAGES, JSON.stringify(pages));
   },
 
-  // --- Products ---
+  // --- Products (Solutions) ---
   getProducts: (): Product[] => {
       return safeParse(STORAGE_KEYS.PRODUCTS, INITIAL_PRODUCTS);
   },
@@ -264,6 +307,27 @@ export const storageService = {
   deleteProduct: (id: string) => {
       const items = storageService.getProducts();
       localStorage.setItem(STORAGE_KEYS.PRODUCTS, JSON.stringify(items.filter(p => p.id !== id)));
+  },
+
+  // --- Blog Posts (Dưỡng vườn tâm) ---
+  getBlogPosts: (): BlogPost[] => {
+      return safeParse(STORAGE_KEYS.BLOG_POSTS, INITIAL_BLOG_POSTS);
+  },
+
+  saveBlogPost: (post: BlogPost) => {
+      const items = storageService.getBlogPosts();
+      const idx = items.findIndex(p => p.id === post.id);
+      if (idx >= 0) {
+          items[idx] = { ...post, updatedAt: new Date().toISOString() };
+      } else {
+          items.push({ ...post, updatedAt: new Date().toISOString() });
+      }
+      localStorage.setItem(STORAGE_KEYS.BLOG_POSTS, JSON.stringify(items));
+  },
+
+  deleteBlogPost: (id: string) => {
+      const items = storageService.getBlogPosts();
+      localStorage.setItem(STORAGE_KEYS.BLOG_POSTS, JSON.stringify(items.filter(p => p.id !== id)));
   },
 
   // --- Supplier Posts ---

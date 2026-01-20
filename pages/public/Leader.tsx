@@ -61,12 +61,12 @@ const Leader = () => {
       <Section className="bg-amber-50">
         <Container className="grid md:grid-cols-2 gap-12 items-center">
           <div>
-            <span className="text-amber-600 font-bold tracking-wider text-sm uppercase">Tuyển Leader Cộng Đồng</span>
+            <span className="text-amber-600 font-bold tracking-wider text-sm uppercase">Tuyển Trưởng Nhóm Khu Vực</span>
             <h1 className="text-4xl md:text-5xl font-bold text-stone-900 mt-2 mb-6">
               Trở thành trái tim <br/>của cộng đồng nơi bạn sống
             </h1>
             <p className="text-lg text-stone-600 mb-8">
-              Leader không phải là "người bán hàng". Leader là người đại diện cho xóm giềng, đồng nghiệp để tìm kiếm và kiểm định những sản phẩm tử tế.
+              Trưởng Nhóm không phải là "người bán hàng". Trưởng Nhóm là người đại diện cho xóm giềng, đồng nghiệp để tìm kiếm và kiểm định những sản phẩm tử tế.
             </p>
             <div className="flex flex-col gap-4">
               {[
@@ -84,7 +84,7 @@ const Leader = () => {
           <div className="bg-white p-6 md:p-8 rounded-2xl shadow-lg border border-amber-100">
              {!submitted ? (
                <form onSubmit={handleSubmit} className="space-y-4">
-                 <h3 className="text-xl font-bold mb-4">Đăng ký tìm hiểu vai trò Leader</h3>
+                 <h3 className="text-xl font-bold mb-4">Đăng ký tìm hiểu vai trò Trưởng Nhóm</h3>
                  <Input 
                     label="Họ và tên" 
                     required 
@@ -147,7 +147,7 @@ const Leader = () => {
       <Section>
         <Container>
           <div className="text-center mb-16">
-            <h2 className="text-3xl font-bold mb-4">Leader làm gì?</h2>
+            <h2 className="text-3xl font-bold mb-4">Trưởng Nhóm làm gì?</h2>
             <p className="text-stone-600">Công việc đơn giản nhưng cần sự tỉ mỉ và chân thành.</p>
           </div>
           

@@ -60,7 +60,7 @@ const Supplier = () => {
       <div className="bg-stone-900 text-stone-100 py-20">
           <Container>
               <div className="max-w-3xl">
-                  <h1 className="text-4xl md:text-5xl font-bold mb-6">Hợp tác cùng Nền tảng Mua Chung Tử Tế</h1>
+                  <h1 className="text-4xl md:text-5xl font-bold mb-6">Hợp tác cùng Alo Mua Chung</h1>
                   <p className="text-xl text-stone-400 mb-8">
                       Chúng tôi giúp Nhà Sản Xuất tập trung vào chất lượng sản phẩm bằng cách giải quyết bài toán đầu ra và marketing thông qua mô hình đặt trước (Pre-order).
                   </p>
@@ -77,7 +77,7 @@ const Supplier = () => {
               <div className="grid md:grid-cols-3 gap-8">
                   {[
                       { icon: TrendingUp, title: "Đầu ra ổn định", desc: "Sản xuất theo số lượng đặt trước. Không lo tồn kho, không lo hư hỏng nông sản." },
-                      { icon: Users, title: "Tiếp cận cộng đồng", desc: "Đưa sản phẩm trực tiếp đến tay hàng ngàn hộ gia đình thông qua mạng lưới Leader tin cậy." },
+                      { icon: Users, title: "Tiếp cận cộng đồng", desc: "Đưa sản phẩm trực tiếp đến tay hàng ngàn hộ gia đình thông qua mạng lưới Trưởng Nhóm Khu Vực tin cậy." },
                       { icon: Handshake, title: "Hợp tác minh bạch", desc: "Thanh toán rõ ràng, sòng phẳng. Tôn trọng giá trị thương hiệu của Nhà sản xuất." }
                   ].map((item, i) => (
                       <FadeIn key={i} delay={i * 100}>

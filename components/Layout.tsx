@@ -1,7 +1,7 @@
 
 import React, { useState, useEffect } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
-import { Menu, X, Leaf, Users, Heart, Anchor, Shield, LogOut, Settings, LayoutDashboard, FileText, MessageSquare, Image, Palette, Package, Briefcase, Facebook, MessageCircle, Home } from 'lucide-react';
+import { Menu, X, Leaf, Users, Heart, Anchor, Shield, LogOut, Settings, LayoutDashboard, FileText, MessageSquare, Image, Palette, Package, Briefcase, Facebook, MessageCircle, Home, Feather } from 'lucide-react';
 import { Button, Container, cn } from './Shared';
 import { storageService } from '../services/store';
 import { SiteConfig } from '../types';
@@ -217,6 +217,7 @@ export const AdminLayout: React.FC<LayoutProps> = ({ children }) => {
     { icon: MessageSquare, label: 'Form Đăng ký', path: '/admin/submissions' },
     { icon: Package, label: 'Sản phẩm & Giá', path: '/admin/products' },
     { icon: Briefcase, label: 'Bài viết NSX', path: '/admin/suppliers' },
+    { icon: Feather, label: 'Dưỡng vườn tâm', path: '/admin/blog' },
     { icon: FileText, label: 'Quản lý Trang', path: '/admin/pages' },
     { icon: Image, label: 'Thư viện ảnh', path: '/admin/media' },
     { icon: Palette, label: 'Giao diện & Menu', path: '/admin/theme' },

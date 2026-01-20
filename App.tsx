@@ -1,3 +1,4 @@
+
 import React, { useEffect, useState, Suspense } from 'react';
 import { HashRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 import { PublicLayout, AdminLayout } from './components/Layout';
@@ -11,6 +12,8 @@ const Home = React.lazy(() => import('./pages/public/Home'));
 const Model = React.lazy(() => import('./pages/public/Model'));
 const Leader = React.lazy(() => import('./pages/public/Leader'));
 const Products = React.lazy(() => import('./pages/public/Products'));
+const Blog = React.lazy(() => import('./pages/public/Blog')); // Dưỡng vườn tâm
+const BlogPost = React.lazy(() => import('./pages/public/BlogPost')); // Chi tiết bài viết
 const Supplier = React.lazy(() => import('./pages/public/Supplier'));
 const Contact = React.lazy(() => import('./pages/public/Contact'));
 const Privacy = React.lazy(() => import('./pages/public/Privacy'));
@@ -25,6 +28,7 @@ const MediaLibrary = React.lazy(() => import('./pages/admin/MediaLibrary').then(
 const ThemeCustomizer = React.lazy(() => import('./pages/admin/ThemeCustomizer').then(module => ({ default: module.ThemeCustomizer })));
 const ProductManager = React.lazy(() => import('./pages/admin/ProductManager').then(module => ({ default: module.ProductManager })));
 const SupplierManager = React.lazy(() => import('./pages/admin/SupplierManager').then(module => ({ default: module.SupplierManager })));
+const BlogManager = React.lazy(() => import('./pages/admin/BlogManager').then(module => ({ default: module.BlogManager })));
 
 // Loading Component
 const PageLoader = () => (
@@ -98,6 +102,10 @@ const App = () => {
           <Route path="/model" element={<PublicLayout><Model /></PublicLayout>} />
           <Route path="/leader" element={<PublicLayout><Leader /></PublicLayout>} />
           <Route path="/products" element={<PublicLayout><Products /></PublicLayout>} />
+          
+          <Route path="/blog" element={<PublicLayout><Blog /></PublicLayout>} />
+          <Route path="/blog/:slug" element={<PublicLayout><BlogPost /></PublicLayout>} />
+
           <Route path="/supplier" element={<PublicLayout><Supplier /></PublicLayout>} />
           <Route path="/philosophy" element={<PublicLayout><PlaceholderPage title="Triết lý & Văn hóa" /></PublicLayout>} />
           
@@ -111,6 +119,7 @@ const App = () => {
           <Route path="/admin/submissions" element={<ProtectedRoute><SubmissionsPage /></ProtectedRoute>} />
           <Route path="/admin/products" element={<ProtectedRoute><ProductManager /></ProtectedRoute>} />
           <Route path="/admin/suppliers" element={<ProtectedRoute><SupplierManager /></ProtectedRoute>} />
+          <Route path="/admin/blog" element={<ProtectedRoute><BlogManager /></ProtectedRoute>} />
           <Route path="/admin/pages" element={<ProtectedRoute><ContentManager /></ProtectedRoute>} />
           <Route path="/admin/media" element={<ProtectedRoute><MediaLibrary /></ProtectedRoute>} />
           <Route path="/admin/theme" element={<ProtectedRoute><ThemeCustomizer /></ProtectedRoute>} />

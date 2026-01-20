@@ -24,7 +24,7 @@ const Model = () => {
         <Container className="text-center px-4">
           <h1 className="text-3xl md:text-5xl font-bold mb-4">{pageData?.title || 'Mô Hình Mua Chung'}</h1>
           <p className="text-lg md:text-xl opacity-90 max-w-2xl mx-auto">
-            Hành trình của một sản phẩm tử tế từ nơi sản xuất đến tay bạn, cắt giảm tối đa chi phí trung gian.
+            Hành trình của một giải pháp tử tế từ nơi sản xuất đến tay bạn, cắt giảm tối đa chi phí trung gian.
           </p>
         </Container>
       </div>
@@ -60,12 +60,12 @@ const Model = () => {
                   <div className="flex flex-col items-center bg-white p-2 z-10 w-full md:w-auto">
                     <div className="w-16 h-16 bg-emerald-700 text-white rounded-full flex items-center justify-center mb-3 md:mb-4 border-4 border-white shadow-lg scale-110">
                       <div className="text-center">
-                        <span className="block font-bold text-xs">MCTT</span>
-                        <span className="block text-[10px] opacity-80">Platform</span>
+                        <span className="block font-bold text-xs">ALO</span>
+                        <span className="block text-[10px] opacity-80">Mua Chung</span>
                       </div>
                     </div>
-                    <span className="font-bold text-lg">Nền Tảng</span>
-                    <span className="text-xs text-stone-500 text-center max-w-[120px]">Kiểm định & Tổ chức</span>
+                    <span className="font-bold text-lg text-center">Alo Mua Chung</span>
+                    <span className="text-xs text-stone-500 text-center max-w-[120px]">Kiểm định & Tổng kho</span>
                   </div>
 
                   <div className="flex text-stone-300">
@@ -77,8 +77,8 @@ const Model = () => {
                     <div className="w-16 h-16 bg-amber-100 text-amber-700 rounded-full flex items-center justify-center mb-3 md:mb-4 border-4 border-white shadow-sm">
                       <UserCheck className="w-8 h-8" />
                     </div>
-                    <span className="font-bold text-lg">Leader</span>
-                    <span className="text-xs text-stone-500 text-center max-w-[120px]">Chăm sóc & Gom đơn</span>
+                    <span className="font-bold text-lg text-center">Trưởng Nhóm</span>
+                    <span className="text-xs text-stone-500 text-center max-w-[120px]">Khu Vực (Leader)</span>
                   </div>
 
                   <div className="flex text-stone-300">
@@ -108,7 +108,7 @@ const Model = () => {
                     {timelineSection.subtitle || "Để đảm bảo giá tốt nhất và hàng mới nhất, chúng tôi không bán sẵn. Mọi thứ hoạt động theo lịch trình chính xác."}
                   </p>
                   <Link to="/products" className="block">
-                    <Button className="w-full sm:w-auto">Xem sản phẩm kỳ này</Button>
+                    <Button className="w-full sm:w-auto">Xem giải pháp kỳ này</Button>
                   </Link>
                 </div>
               </div>
@@ -140,7 +140,7 @@ const Model = () => {
                 <span className="text-red-500 text-xl">✕</span> Hiểu nhầm: Đa cấp
               </h4>
               <p className="text-sm text-stone-600">
-                Sự thật: Chúng tôi chỉ có 1 cấp Leader duy nhất – người phục vụ cộng đồng. Không có hoa hồng tầng lớp, không tuyển tuyến dưới để ăn chia.
+                Sự thật: Chúng tôi chỉ có 1 cấp Trưởng Nhóm Khu Vực duy nhất – người phục vụ cộng đồng. Không có hoa hồng tầng lớp, không tuyển tuyến dưới.
               </p>
             </Card>
             <Card className="p-6 border-l-4 border-red-500 bg-white">

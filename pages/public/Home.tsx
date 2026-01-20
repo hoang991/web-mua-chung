@@ -93,10 +93,10 @@ const Home = () => {
                   </Link>
                   <div className="flex gap-2 w-full sm:w-auto">
                     <Link to="/leader" className="flex-1 sm:flex-none">
-                      <Button variant="outline" size="lg" className="w-full py-3.5 md:py-3 text-center justify-center">Dành cho Leader</Button>
+                      <Button variant="outline" size="lg" className="w-full py-3.5 md:py-3 text-center justify-center">Đăng ký Trưởng Nhóm</Button>
                     </Link>
                     <Link to="/supplier" className="flex-1 sm:flex-none">
-                      <Button variant="ghost" size="lg" className="w-full py-3.5 md:py-3 text-center justify-center">NSX</Button>
+                      <Button variant="ghost" size="lg" className="w-full py-3.5 md:py-3 text-center justify-center">Nhà Sản Xuất</Button>
                     </Link>
                   </div>
                 </div>
