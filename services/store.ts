@@ -1,30 +1,13 @@
 
 import { SiteConfig, FormSubmission, DEFAULT_CONFIG, PageData, MediaItem, BlogPost, Product, SupplierPost } from '../types';
+import { supabase } from './supabase';
 
+// Keys for LocalStorage (Fallback)
 const STORAGE_KEYS = {
-  CONFIG: 'mctt_config',
-  SUBMISSIONS: 'mctt_submissions',
-  AUTH: 'mctt_auth',
-  ADMIN_PASS: 'mctt_admin_pass', // New key for password
-  PAGES: 'mctt_pages',
-  MEDIA: 'mctt_media',
-  PRODUCTS: 'mctt_products',
-  SUPPLIER_POSTS: 'mctt_supplier_posts',
-  BLOG_POSTS: 'mctt_blog_posts' // New key for Dưỡng vườn tâm
+  AUTH_CACHE: 'mctt_auth_session', // Cache session status
 };
 
-// Helper for safe parsing to prevent white-screen crashes
-const safeParse = <T>(key: string, fallback: T): T => {
-  try {
-    const item = localStorage.getItem(key);
-    return item ? JSON.parse(item) : fallback;
-  } catch (error) {
-    console.error(`Error parsing key ${key}:`, error);
-    return fallback;
-  }
-};
-
-// Initial Pages Data
+// Initial Data Constants (Giữ nguyên như cũ để seed dữ liệu)
 const INITIAL_PAGES: PageData[] = [
   {
     slug: 'home',
@@ -163,7 +146,6 @@ const INITIAL_PAGES: PageData[] = [
   }
 ];
 
-// Initial Product Data
 const INITIAL_PRODUCTS: Product[] = [
     {
         id: 'p1',
@@ -183,7 +165,6 @@ const INITIAL_PRODUCTS: Product[] = [
     }
 ];
 
-// Initial Blog Posts
 const INITIAL_BLOG_POSTS: BlogPost[] = [
     {
         id: 'b1',
@@ -232,149 +213,350 @@ const INITIAL_BLOG_POSTS: BlogPost[] = [
     }
 ];
 
+// Observer Pattern Type
+type StoreListener = () => void;
+
+// In-Memory Cache with Realtime Capabilities
+class StoreCache {
+    config: SiteConfig = DEFAULT_CONFIG;
+    pages: PageData[] = [];
+    products: Product[] = [];
+    blogPosts: BlogPost[] = [];
+    supplierPosts: SupplierPost[] = [];
+    submissions: FormSubmission[] = [];
+    media: MediaItem[] = [];
+    
+    isInitialized: boolean = false;
+    isAuthenticated: boolean = false;
+    
+    listeners: Set<StoreListener> = new Set();
+}
+
+const cache = new StoreCache();
+
+// Helper to notify all UI components to re-render
+const notify = () => {
+    cache.listeners.forEach(l => l());
+};
+
 export const storageService = {
+  // --- Observer / Subscription ---
+  subscribe: (listener: StoreListener) => {
+      cache.listeners.add(listener);
+      return () => {
+          cache.listeners.delete(listener);
+      };
+  },
+
+  // --- Initialization ---
+  init: async (): Promise<void> => {
+    if (cache.isInitialized) return;
+
+    try {
+        console.log("Initializing storage from Supabase...");
+        
+        // 0. Check Session
+        const { data: { session } } = await supabase.auth.getSession();
+        cache.isAuthenticated = !!session;
+
+        // 1. Config
+        const { data: configData } = await supabase.from('config').select('*').eq('key', 'main').single();
+        if (configData) {
+            cache.config = { ...DEFAULT_CONFIG, ...configData.value };
+        } else {
+            await supabase.from('config').insert({ key: 'main', value: DEFAULT_CONFIG });
+            cache.config = DEFAULT_CONFIG;
+        }
+
+        // 2. Pages
+        const { data: pagesData } = await supabase.from('pages').select('*');
+        if (pagesData && pagesData.length > 0) {
+            cache.pages = pagesData.map(p => ({ ...p.data, slug: p.slug }));
+        } else {
+            cache.pages = INITIAL_PAGES;
+            for (const p of INITIAL_PAGES) {
+                await supabase.from('pages').insert({ slug: p.slug, data: p });
+            }
+        }
+
+        // 3. Products
+        const { data: prodData } = await supabase.from('products').select('*');
+        if (prodData && prodData.length > 0) {
+            cache.products = prodData.map(p => p.data);
+        } else {
+            cache.products = INITIAL_PRODUCTS;
+             for (const p of INITIAL_PRODUCTS) {
+                await supabase.from('products').insert({ id: p.id, data: p });
+            }
+        }
+
+        // 4. Posts (Blog & Supplier)
+        const { data: postData } = await supabase.from('posts').select('*');
+        cache.blogPosts = [];
+        cache.supplierPosts = [];
+        
+        if (postData && postData.length > 0) {
+            postData.forEach(p => {
+                if (p.type === 'blog') cache.blogPosts.push(p.data);
+                if (p.type === 'supplier') cache.supplierPosts.push(p.data);
+            });
+        } else {
+             cache.blogPosts = INITIAL_BLOG_POSTS;
+             for (const p of INITIAL_BLOG_POSTS) {
+                await supabase.from('posts').insert({ id: p.id, type: 'blog', data: p });
+            }
+        }
+
+        // 5. Submissions
+        const { data: subData } = await supabase.from('submissions').select('*');
+        if (subData) {
+            cache.submissions = subData.map(s => s.data);
+        }
+
+        // 6. Media
+        const { data: mediaData } = await supabase.from('media').select('*');
+        if (mediaData) {
+            cache.media = mediaData.map(m => m.data);
+        }
+
+        // 7. Setup Realtime Listeners
+        storageService.setupRealtime();
+
+        cache.isInitialized = true;
+        notify(); // Initial notify
+
+    } catch (error) {
+        console.error("Initialization failed, falling back to local defaults:", error);
+        cache.pages = INITIAL_PAGES;
+        cache.products = INITIAL_PRODUCTS;
+        cache.blogPosts = INITIAL_BLOG_POSTS;
+        cache.isInitialized = true;
+    }
+  },
+
+  // --- Realtime Setup ---
+  setupRealtime: () => {
+      supabase.channel('public-db-changes')
+        .on('postgres_changes', { event: '*', schema: 'public' }, (payload) => {
+            console.log('Realtime update received:', payload);
+            const { table, eventType, new: newRecord, old: oldRecord } = payload as any;
+
+            // Helper to update array by ID
+            const updateArray = (arr: any[], idField: string, newData: any) => {
+                const idx = arr.findIndex(item => item[idField] === newData[idField]);
+                if (idx !== -1) arr[idx] = newData;
+                else arr.push(newData);
+            };
+            
+            const deleteFromArray = (arr: any[], idField: string, id: string) => {
+                const idx = arr.findIndex(item => item[idField] === id);
+                if (idx !== -1) arr.splice(idx, 1);
+            };
+
+            // Map DB changes to Cache
+            if (table === 'config' && newRecord) {
+                if (newRecord.key === 'main') cache.config = newRecord.value;
+            }
+            else if (table === 'pages') {
+                if (eventType === 'DELETE') deleteFromArray(cache.pages, 'slug', oldRecord.slug);
+                else if (newRecord) updateArray(cache.pages, 'slug', { ...newRecord.data, slug: newRecord.slug });
+            }
+            else if (table === 'products') {
+                if (eventType === 'DELETE') deleteFromArray(cache.products, 'id', oldRecord.id);
+                else if (newRecord) updateArray(cache.products, 'id', newRecord.data);
+            }
+            else if (table === 'posts') {
+                if (eventType === 'DELETE') {
+                    deleteFromArray(cache.blogPosts, 'id', oldRecord.id);
+                    deleteFromArray(cache.supplierPosts, 'id', oldRecord.id);
+                } else if (newRecord) {
+                    if (newRecord.type === 'blog') updateArray(cache.blogPosts, 'id', newRecord.data);
+                    if (newRecord.type === 'supplier') updateArray(cache.supplierPosts, 'id', newRecord.data);
+                }
+            }
+            else if (table === 'submissions') {
+                if (eventType === 'DELETE') deleteFromArray(cache.submissions, 'id', oldRecord.id);
+                else if (newRecord) updateArray(cache.submissions, 'id', newRecord.data);
+            }
+            else if (table === 'media') {
+                 if (eventType === 'DELETE') deleteFromArray(cache.media, 'id', oldRecord.id);
+                 else if (newRecord) updateArray(cache.media, 'id', newRecord.data);
+            }
+            notify(); // Trigger UI updates
+        })
+        .subscribe();
+  },
+
   // --- Config ---
   getConfig: (): SiteConfig => {
-    // Merge with default to ensure new fields like aiKeys exist if local storage is old
-    const stored = safeParse(STORAGE_KEYS.CONFIG, DEFAULT_CONFIG);
-    return { ...DEFAULT_CONFIG, ...stored, aiKeys: { ...DEFAULT_CONFIG.aiKeys, ...stored.aiKeys } };
+    return cache.config;
   },
 
-  saveConfig: (config: SiteConfig) => {
-    localStorage.setItem(STORAGE_KEYS.CONFIG, JSON.stringify(config));
+  saveConfig: async (config: SiteConfig) => {
+    cache.config = config;
+    await supabase.from('config').upsert({ key: 'main', value: config });
+    notify();
   },
 
-  // --- Auth ---
+  // --- Auth (Supabase) ---
   checkAuth: (): boolean => {
-    return localStorage.getItem(STORAGE_KEYS.AUTH) === 'true';
+    return cache.isAuthenticated;
   },
 
-  login: (password: string): boolean => {
-    // Check against stored password, default is 'admin123'
-    const storedPass = localStorage.getItem(STORAGE_KEYS.ADMIN_PASS) || 'admin123';
-    if (password === storedPass) {
-      localStorage.setItem(STORAGE_KEYS.AUTH, 'true');
-      return true;
+  login: async (email: string, password: string): Promise<{ success: boolean, error?: string }> => {
+    const { data, error } = await supabase.auth.signInWithPassword({ email, password });
+    if (error) {
+        return { success: false, error: error.message };
     }
-    return false;
+    if (data.session) {
+        cache.isAuthenticated = true;
+        notify();
+        return { success: true };
+    }
+    return { success: false, error: 'Unknown error' };
+  },
+
+  logout: async () => {
+    await supabase.auth.signOut();
+    cache.isAuthenticated = false;
+    notify();
   },
 
   changePassword: (newPass: string) => {
-      localStorage.setItem(STORAGE_KEYS.ADMIN_PASS, newPass);
-  },
-
-  logout: () => {
-    localStorage.removeItem(STORAGE_KEYS.AUTH);
+      console.log("Password change handled by Supabase Auth UI now");
   },
 
   // --- Pages ---
   getPages: (): PageData[] => {
-    return safeParse(STORAGE_KEYS.PAGES, INITIAL_PAGES);
+    return cache.pages;
   },
 
   getPage: (slug: string): PageData | undefined => {
-    const pages = storageService.getPages();
-    return pages.find(p => p.slug === slug);
+    return cache.pages.find(p => p.slug === slug);
   },
 
-  savePage: (page: PageData) => {
-     const pages = storageService.getPages();
-     const idx = pages.findIndex(p => p.slug === page.slug);
-     if (idx >= 0) {
-       pages[idx] = { ...page, updatedAt: new Date().toISOString() };
-     } else {
-       pages.push({ ...page, updatedAt: new Date().toISOString() });
-     }
-     localStorage.setItem(STORAGE_KEYS.PAGES, JSON.stringify(pages));
+  savePage: async (page: PageData) => {
+     const idx = cache.pages.findIndex(p => p.slug === page.slug);
+     if (idx >= 0) cache.pages[idx] = { ...page, updatedAt: new Date().toISOString() };
+     else cache.pages.push({ ...page, updatedAt: new Date().toISOString() });
+     
+     await supabase.from('pages').upsert({ 
+         slug: page.slug, 
+         data: page, 
+         updated_at: new Date().toISOString() 
+     });
+     notify();
   },
 
-  // --- Products (Solutions) ---
+  // --- Products ---
   getProducts: (): Product[] => {
-      return safeParse(STORAGE_KEYS.PRODUCTS, INITIAL_PRODUCTS);
+      return cache.products;
   },
   
-  saveProduct: (product: Product) => {
-      const items = storageService.getProducts();
-      const idx = items.findIndex(p => p.id === product.id);
-      if (idx >= 0) {
-          items[idx] = { ...product, updatedAt: new Date().toISOString() };
-      } else {
-          items.push({ ...product, updatedAt: new Date().toISOString() });
-      }
-      localStorage.setItem(STORAGE_KEYS.PRODUCTS, JSON.stringify(items));
+  saveProduct: async (product: Product) => {
+      const idx = cache.products.findIndex(p => p.id === product.id);
+      if (idx >= 0) cache.products[idx] = { ...product, updatedAt: new Date().toISOString() };
+      else cache.products.push({ ...product, updatedAt: new Date().toISOString() });
+
+      await supabase.from('products').upsert({
+          id: product.id,
+          data: product,
+          updated_at: new Date().toISOString()
+      });
+      notify();
   },
 
-  deleteProduct: (id: string) => {
-      const items = storageService.getProducts();
-      localStorage.setItem(STORAGE_KEYS.PRODUCTS, JSON.stringify(items.filter(p => p.id !== id)));
+  deleteProduct: async (id: string) => {
+      cache.products = cache.products.filter(p => p.id !== id);
+      await supabase.from('products').delete().eq('id', id);
+      notify();
   },
 
-  // --- Blog Posts (Dưỡng vườn tâm) ---
+  // --- Blog Posts ---
   getBlogPosts: (): BlogPost[] => {
-      return safeParse(STORAGE_KEYS.BLOG_POSTS, INITIAL_BLOG_POSTS);
+      return cache.blogPosts;
   },
 
-  saveBlogPost: (post: BlogPost) => {
-      const items = storageService.getBlogPosts();
-      const idx = items.findIndex(p => p.id === post.id);
-      if (idx >= 0) {
-          items[idx] = { ...post, updatedAt: new Date().toISOString() };
-      } else {
-          items.push({ ...post, updatedAt: new Date().toISOString() });
-      }
-      localStorage.setItem(STORAGE_KEYS.BLOG_POSTS, JSON.stringify(items));
+  saveBlogPost: async (post: BlogPost) => {
+      const idx = cache.blogPosts.findIndex(p => p.id === post.id);
+      if (idx >= 0) cache.blogPosts[idx] = { ...post, updatedAt: new Date().toISOString() };
+      else cache.blogPosts.push({ ...post, updatedAt: new Date().toISOString() });
+
+      await supabase.from('posts').upsert({
+          id: post.id,
+          type: 'blog',
+          data: post,
+          updated_at: new Date().toISOString()
+      });
+      notify();
   },
 
-  deleteBlogPost: (id: string) => {
-      const items = storageService.getBlogPosts();
-      localStorage.setItem(STORAGE_KEYS.BLOG_POSTS, JSON.stringify(items.filter(p => p.id !== id)));
+  deleteBlogPost: async (id: string) => {
+      cache.blogPosts = cache.blogPosts.filter(p => p.id !== id);
+      await supabase.from('posts').delete().eq('id', id);
+      notify();
   },
 
   // --- Supplier Posts ---
   getSupplierPosts: (): SupplierPost[] => {
-      return safeParse(STORAGE_KEYS.SUPPLIER_POSTS, []);
+      return cache.supplierPosts;
   },
 
-  saveSupplierPost: (post: SupplierPost) => {
-      const items = storageService.getSupplierPosts();
-      const idx = items.findIndex(p => p.id === post.id);
-      if (idx >= 0) {
-          items[idx] = { ...post, updatedAt: new Date().toISOString() };
-      } else {
-          items.push({ ...post, updatedAt: new Date().toISOString() });
-      }
-      localStorage.setItem(STORAGE_KEYS.SUPPLIER_POSTS, JSON.stringify(items));
+  saveSupplierPost: async (post: SupplierPost) => {
+      const idx = cache.supplierPosts.findIndex(p => p.id === post.id);
+      if (idx >= 0) cache.supplierPosts[idx] = { ...post, updatedAt: new Date().toISOString() };
+      else cache.supplierPosts.push({ ...post, updatedAt: new Date().toISOString() });
+
+      await supabase.from('posts').upsert({
+          id: post.id,
+          type: 'supplier',
+          data: post,
+          updated_at: new Date().toISOString()
+      });
+      notify();
   },
 
-  deleteSupplierPost: (id: string) => {
-      const items = storageService.getSupplierPosts();
-      localStorage.setItem(STORAGE_KEYS.SUPPLIER_POSTS, JSON.stringify(items.filter(p => p.id !== id)));
+  deleteSupplierPost: async (id: string) => {
+      cache.supplierPosts = cache.supplierPosts.filter(p => p.id !== id);
+      await supabase.from('posts').delete().eq('id', id);
+      notify();
   },
 
   // --- Submissions ---
   getSubmissions: (): FormSubmission[] => {
-    return safeParse(STORAGE_KEYS.SUBMISSIONS, []);
+    return cache.submissions.sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
   },
 
-  addSubmission: (submission: Omit<FormSubmission, 'id' | 'createdAt' | 'status'>) => {
-    const current = storageService.getSubmissions();
+  addSubmission: async (submission: Omit<FormSubmission, 'id' | 'createdAt' | 'status'>) => {
     const newSubmission: FormSubmission = {
       ...submission,
       id: Math.random().toString(36).substr(2, 9),
       createdAt: new Date().toISOString(),
       status: 'new'
     };
-    localStorage.setItem(STORAGE_KEYS.SUBMISSIONS, JSON.stringify([newSubmission, ...current]));
+    cache.submissions.unshift(newSubmission);
+    
+    await supabase.from('submissions').insert({
+        id: newSubmission.id,
+        type: newSubmission.type,
+        data: newSubmission
+    });
+    notify();
   },
 
-  updateSubmissionStatus: (id: string, status: FormSubmission['status']) => {
-    const current = storageService.getSubmissions();
-    const updated = current.map(s => s.id === id ? { ...s, status } : s);
-    localStorage.setItem(STORAGE_KEYS.SUBMISSIONS, JSON.stringify(updated));
+  updateSubmissionStatus: async (id: string, status: FormSubmission['status']) => {
+    const idx = cache.submissions.findIndex(s => s.id === id);
+    if (idx >= 0) {
+        cache.submissions[idx].status = status;
+        await supabase.from('submissions').update({
+            data: cache.submissions[idx]
+        }).eq('id', id);
+        notify();
+    }
   },
   
   exportSubmissions: (): void => {
-      const data = storageService.getSubmissions();
+      const data = cache.submissions;
       const csvContent = "data:text/csv;charset=utf-8," 
           + "Date,Type,Name,Email,Phone,Status\n"
           + data.map(e => `${e.createdAt},${e.type},${e.name},${e.email},${e.phone},${e.status}`).join("\n");
@@ -387,23 +569,58 @@ export const storageService = {
       document.body.removeChild(link);
   },
 
-  // --- Media ---
+  // --- Media & Storage ---
   getMedia: (): MediaItem[] => {
-    return safeParse(STORAGE_KEYS.MEDIA, []);
+    return cache.media;
   },
 
-  addMedia: (item: Omit<MediaItem, 'id' | 'createdAt'>) => {
-    const current = storageService.getMedia();
+  addMedia: async (item: Omit<MediaItem, 'id' | 'createdAt'>) => {
     const newItem: MediaItem = {
       ...item,
       id: Math.random().toString(36).substr(2, 9),
       createdAt: new Date().toISOString()
     };
-    localStorage.setItem(STORAGE_KEYS.MEDIA, JSON.stringify([newItem, ...current]));
+    cache.media.unshift(newItem);
+
+    await supabase.from('media').insert({
+        id: newItem.id,
+        data: newItem
+    });
+    notify();
   },
 
-  deleteMedia: (id: string) => {
-    const current = storageService.getMedia();
-    localStorage.setItem(STORAGE_KEYS.MEDIA, JSON.stringify(current.filter(i => i.id !== id)));
+  // NEW: Upload file to Supabase Storage
+  uploadImage: async (file: File): Promise<string | null> => {
+      try {
+          // 1. Upload to bucket
+          const fileName = `${Date.now()}-${file.name.replace(/[^a-zA-Z0-9.]/g, '_')}`;
+          const { data, error } = await supabase.storage.from('images').upload(fileName, file);
+          
+          if (error) {
+              console.error('Storage upload error:', error);
+              return null;
+          }
+
+          // 2. Get Public URL
+          const { data: { publicUrl } } = supabase.storage.from('images').getPublicUrl(fileName);
+
+          // 3. Add to Media Library Database automatically
+          await storageService.addMedia({
+              name: file.name,
+              url: publicUrl,
+              type: 'image'
+          });
+
+          return publicUrl;
+      } catch (e) {
+          console.error("Exception uploading:", e);
+          return null;
+      }
+  },
+
+  deleteMedia: async (id: string) => {
+    cache.media = cache.media.filter(i => i.id !== id);
+    await supabase.from('media').delete().eq('id', id);
+    notify();
   }
 };

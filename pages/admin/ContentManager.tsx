@@ -3,7 +3,7 @@ import React, { useState, useEffect } from 'react';
 import { storageService } from '../../services/store';
 import { PageData, SectionContent } from '../../types';
 import { Card, Button, Input, Textarea } from '../../components/Shared';
-import { Edit, Save, ArrowLeft, Eye, EyeOff, Layout, ArrowUp, ArrowDown, Globe, Plus, Trash2 } from 'lucide-react';
+import { Edit, Save, ArrowLeft, Eye, EyeOff, Layout, ArrowUp, ArrowDown, Globe, Plus, Trash2, Loader2 } from 'lucide-react';
 
 const PageList = ({ onSelect }: { onSelect: (slug: string) => void }) => {
   const [pages, setPages] = useState<PageData[]>([]);
@@ -16,7 +16,6 @@ const PageList = ({ onSelect }: { onSelect: (slug: string) => void }) => {
     <div className="space-y-6">
       <div className="flex justify-between items-center">
          <h1 className="text-2xl font-bold text-stone-900">Quản lý Trang</h1>
-         {/* Future: Add 'Create New Page' button here */}
       </div>
       <div className="grid gap-4">
         {pages.map(page => (
@@ -50,11 +49,17 @@ const PageEditor = ({ slug, onBack }: { slug: string; onBack: () => void }) => {
     if (data) setPage(data);
   }, [slug]);
 
-  const handleSave = () => {
+  const handleSave = async () => {
     if (!page) return;
     setIsSaving(true);
-    storageService.savePage(page);
-    setTimeout(() => setIsSaving(false), 800);
+    try {
+        await storageService.savePage(page);
+    } catch(err) {
+        console.error(err);
+        alert('Có lỗi khi lưu!');
+    } finally {
+        setIsSaving(false);
+    }
   };
 
   const updateSection = (idx: number, updates: Partial<SectionContent>) => {
@@ -131,8 +136,8 @@ const PageEditor = ({ slug, onBack }: { slug: string; onBack: () => void }) => {
             <a href={`#/${page.slug === 'home' ? '' : page.slug}`} target="_blank" rel="noreferrer">
                 <Button variant="outline"><Eye className="w-4 h-4 mr-2"/> Xem thử</Button>
             </a>
-            <Button onClick={handleSave} className="shadow-lg">
-                <Save className="w-5 h-5 mr-2" />
+            <Button onClick={handleSave} className="shadow-lg" disabled={isSaving}>
+                {isSaving ? <Loader2 className="w-5 h-5 mr-2 animate-spin"/> : <Save className="w-5 h-5 mr-2" />}
                 {isSaving ? 'Đang lưu...' : 'Lưu thay đổi'}
             </Button>
         </div>

@@ -3,7 +3,7 @@ import React, { useState, useEffect } from 'react';
 import { storageService } from '../../services/store';
 import { FormSubmission, SiteConfig } from '../../types';
 import { Card, Button, Input } from '../../components/Shared';
-import { Trash2, CheckCircle, Mail, Settings as SettingsIcon, Download, FileText, Layout, Image, Share2, MessageCircle, Sparkles, Lock } from 'lucide-react';
+import { Trash2, CheckCircle, Mail, Settings as SettingsIcon, Download, FileText, Layout, Image, Share2, MessageCircle, Sparkles, Lock, Loader2, Save } from 'lucide-react';
 import { Link } from 'react-router-dom';
 
 export const DashboardHome = () => {
@@ -110,8 +110,8 @@ export const SubmissionsPage = () => {
     setSubmissions(storageService.getSubmissions());
   }, []);
 
-  const handleMarkRead = (id: string) => {
-    storageService.updateSubmissionStatus(id, 'read');
+  const handleMarkRead = async (id: string) => {
+    await storageService.updateSubmissionStatus(id, 'read');
     setSubmissions(storageService.getSubmissions());
   };
   
@@ -166,17 +166,22 @@ export const SubmissionsPage = () => {
 
 export const SettingsPage = () => {
   const [config, setConfig] = useState<SiteConfig>(storageService.getConfig());
-  const [saved, setSaved] = useState(false);
+  const [isSaving, setIsSaving] = useState(false);
   
   // Password Change State
   const [passForm, setPassForm] = useState({ newPass: '', confirmPass: '' });
   const [passMsg, setPassMsg] = useState('');
 
-  const handleSave = (e: React.FormEvent) => {
+  const handleSave = async (e: React.FormEvent) => {
     e.preventDefault();
-    storageService.saveConfig(config);
-    setSaved(true);
-    setTimeout(() => setSaved(false), 2000);
+    setIsSaving(true);
+    try {
+        await storageService.saveConfig(config);
+    } catch (err) {
+        console.error(err);
+    } finally {
+        setIsSaving(false);
+    }
   };
 
   const handlePasswordChange = (e: React.FormEvent) => {
@@ -329,8 +334,9 @@ export const SettingsPage = () => {
                 </div>
 
                 <div className="pt-4">
-                  <Button type="submit" disabled={saved}>
-                    {saved ? 'Đã lưu thay đổi!' : 'Lưu cấu hình'}
+                  <Button type="submit" disabled={isSaving}>
+                    {isSaving ? <Loader2 className="w-4 h-4 animate-spin mr-2"/> : <Save className="w-4 h-4 mr-2"/>}
+                    {isSaving ? 'Đang lưu...' : 'Lưu cấu hình'}
                   </Button>
                 </div>
              </form>

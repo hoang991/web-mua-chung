@@ -1,21 +1,25 @@
+
 import React, { useState } from 'react';
 import { storageService } from '../../services/store';
 import { SiteConfig, ThemeColor, ThemeFont } from '../../types';
 import { Card, Button, Input } from '../../components/Shared';
-import { Palette, Type, Save, Menu as MenuIcon, Eye, EyeOff, ArrowUp, ArrowDown } from 'lucide-react';
+import { Palette, Type, Save, Menu as MenuIcon, Eye, EyeOff, ArrowUp, ArrowDown, Loader2 } from 'lucide-react';
 
 export const ThemeCustomizer = () => {
   const [config, setConfig] = useState<SiteConfig>(storageService.getConfig());
   const [isSaving, setIsSaving] = useState(false);
 
-  const handleSave = () => {
+  const handleSave = async () => {
       setIsSaving(true);
-      storageService.saveConfig(config);
-      setTimeout(() => {
-          setIsSaving(false);
+      try {
+          await storageService.saveConfig(config);
           // Reload to apply theme globally
           window.location.reload(); 
-      }, 800);
+      } catch (err) {
+          console.error(err);
+          setIsSaving(false);
+          alert('Có lỗi khi lưu giao diện');
+      }
   };
 
   const colors: {id: ThemeColor, hex: string}[] = [
@@ -57,8 +61,8 @@ export const ThemeCustomizer = () => {
     <div className="space-y-8 pb-20">
       <div className="flex justify-between items-center">
           <h1 className="text-2xl font-bold text-stone-900">Giao diện & Menu</h1>
-          <Button onClick={handleSave} className="shadow-lg">
-                <Save className="w-5 h-5 mr-2" />
+          <Button onClick={handleSave} className="shadow-lg" disabled={isSaving}>
+                {isSaving ? <Loader2 className="w-5 h-5 mr-2 animate-spin"/> : <Save className="w-5 h-5 mr-2" />}
                 {isSaving ? 'Đang lưu...' : 'Lưu & Áp dụng'}
           </Button>
       </div>

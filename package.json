@@ -17,7 +17,8 @@
     "tailwind-merge": "^3.4.0",
     "react-helmet": "^6.1.0",
     "leaflet": "1.9.4",
-    "react-leaflet": "^5.0.0"
+    "react-leaflet": "^5.0.0",
+    "@supabase/supabase-js": "2"
   },
   "devDependencies": {
     "@types/node": "^22.14.0",

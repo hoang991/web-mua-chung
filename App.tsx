@@ -5,7 +5,7 @@ import { PublicLayout, AdminLayout } from './components/Layout';
 import { SEOHead } from './components/SEO';
 import { storageService } from './services/store';
 import { Button, Input, Card } from './components/Shared';
-import { Loader2 } from 'lucide-react';
+import { Loader2, AlertCircle } from 'lucide-react';
 
 // Lazy load pages for better performance
 const Home = React.lazy(() => import('./pages/public/Home'));
@@ -37,18 +37,34 @@ const PageLoader = () => (
   </div>
 );
 
-// Simple Login Page for Admin
+// Full Screen App Loader (For Init)
+const AppInitLoader = () => (
+  <div className="fixed inset-0 bg-stone-50 z-50 flex flex-col items-center justify-center">
+      <Loader2 className="w-12 h-12 text-emerald-600 animate-spin mb-4" />
+      <h2 className="text-xl font-bold text-stone-700">Đang kết nối dữ liệu...</h2>
+      <p className="text-stone-500 mt-2">Vui lòng đợi trong giây lát.</p>
+  </div>
+);
+
+// Updated Login Page for Supabase Auth
 const LoginPage = () => {
-  const [pass, setPass] = useState('');
-  const [error, setError] = useState(false);
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
+  const [error, setError] = useState<string | null>(null);
+  const [isLoading, setIsLoading] = useState(false);
   
-  const handleLogin = (e: React.FormEvent) => {
+  const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (storageService.login(pass)) {
+    setError(null);
+    setIsLoading(true);
+
+    const result = await storageService.login(email, password);
+    if (result.success) {
       window.location.href = '#/admin';
     } else {
-      setError(true);
+      setError(result.error || 'Đăng nhập thất bại');
     }
+    setIsLoading(false);
   };
 
   return (
@@ -57,14 +73,33 @@ const LoginPage = () => {
         <h2 className="text-2xl font-bold text-center mb-6">Admin Login</h2>
         <form onSubmit={handleLogin} className="space-y-4">
           <Input 
-            type="password" 
-            placeholder="Mật khẩu (admin123)" 
-            value={pass}
-            onChange={e => setPass(e.target.value)}
+            type="email"
+            label="Email"
+            placeholder="admin@example.com" 
+            value={email}
+            onChange={e => setEmail(e.target.value)}
+            required
           />
-          {error && <p className="text-red-500 text-sm">Sai mật khẩu</p>}
-          <Button type="submit" className="w-full">Đăng nhập</Button>
+          <Input 
+            type="password" 
+            label="Mật khẩu"
+            placeholder="••••••" 
+            value={password}
+            onChange={e => setPassword(e.target.value)}
+            required
+          />
+          {error && (
+              <div className="p-3 bg-red-50 text-red-600 text-sm rounded-lg flex items-center gap-2">
+                  <AlertCircle className="w-4 h-4"/> {error}
+              </div>
+          )}
+          <Button type="submit" className="w-full" disabled={isLoading}>
+              {isLoading ? <Loader2 className="w-4 h-4 animate-spin"/> : 'Đăng nhập'}
+          </Button>
         </form>
+        <p className="text-xs text-stone-400 text-center mt-4">
+            Đăng nhập bằng tài khoản Supabase Auth.
+        </p>
       </Card>
     </div>
   );
@@ -92,6 +127,17 @@ const PlaceholderPage = ({ title }: { title: string }) => (
 );
 
 const App = () => {
+  const [isInitialized, setIsInitialized] = useState(false);
+
+  useEffect(() => {
+    // Initialize storage (fetch from Supabase) before rendering
+    storageService.init().then(() => {
+        setIsInitialized(true);
+    });
+  }, []);
+
+  if (!isInitialized) return <AppInitLoader />;
+
   return (
     <Router>
       <GlobalSEO />

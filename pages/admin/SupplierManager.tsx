@@ -14,11 +14,11 @@ const SupplierPostList = ({ onSelect }: { onSelect: (post: SupplierPost) => void
     setPosts(storageService.getSupplierPosts());
   }, []);
 
-  const handleDelete = (id: string, e: React.MouseEvent) => {
+  const handleDelete = async (id: string, e: React.MouseEvent) => {
       e.preventDefault();
       e.stopPropagation(); // Stop propagation
       if(window.confirm('Xóa bài viết này? Hành động này không thể hoàn tác.')) {
-          storageService.deleteSupplierPost(id);
+          await storageService.deleteSupplierPost(id);
           setPosts(storageService.getSupplierPosts());
       }
   };
@@ -102,18 +102,22 @@ const PostEditor = ({ post: initialPost, onBack }: { post: SupplierPost; onBack:
   const [isGenerating, setIsGenerating] = useState(false);
   const [showMediaPicker, setShowMediaPicker] = useState(false);
 
-  const handleSave = () => {
+  const handleSave = async () => {
     if (!post.title) return alert("Vui lòng nhập tiêu đề");
     setIsSaving(true);
     const finalPost = {
         ...post,
         slug: post.slug || post.title.toLowerCase().replace(/ /g, '-').replace(/[^\w-]+/g, '')
     }
-    storageService.saveSupplierPost(finalPost);
-    setTimeout(() => {
-        setIsSaving(false);
+    try {
+        await storageService.saveSupplierPost(finalPost);
         onBack();
-    }, 500);
+    } catch(err) {
+        console.error(err);
+        alert("Lỗi khi lưu bài viết");
+    } finally {
+        setIsSaving(false);
+    }
   };
 
   const handleAiGenerate = async () => {
@@ -159,8 +163,8 @@ const PostEditor = ({ post: initialPost, onBack }: { post: SupplierPost; onBack:
                 {isGenerating ? <Loader2 className="w-4 h-4 mr-2 animate-spin"/> : <Sparkles className="w-4 h-4 mr-2" />}
                 Viết bằng AI
             </Button>
-            <Button onClick={handleSave} className="shadow-lg">
-                <Save className="w-5 h-5 mr-2" />
+            <Button onClick={handleSave} className="shadow-lg" disabled={isSaving}>
+                {isSaving ? <Loader2 className="w-5 h-5 mr-2 animate-spin"/> : <Save className="w-5 h-5 mr-2" />}
                 {isSaving ? 'Đang lưu...' : 'Lưu bài viết'}
             </Button>
         </div>

@@ -11,27 +11,33 @@ const ProductList = ({ onSelect }: { onSelect: (product: Product) => void }) => 
   const [products, setProducts] = useState<Product[]>([]);
 
   useEffect(() => {
+    // Initial fetch
     setProducts(storageService.getProducts());
+    
+    // Subscribe to changes (Realtime from Supabase)
+    const unsubscribe = storageService.subscribe(() => {
+        setProducts(storageService.getProducts());
+    });
+    return unsubscribe;
   }, []);
 
-  const handleDelete = (id: string, e: React.MouseEvent) => {
+  const handleDelete = async (id: string, e: React.MouseEvent) => {
       e.preventDefault();
-      e.stopPropagation(); // Critical for stopping card click
+      e.stopPropagation();
       if(window.confirm('Bạn có chắc chắn muốn xóa sản phẩm này? Hành động này không thể hoàn tác.')) {
-          storageService.deleteProduct(id);
-          setProducts(storageService.getProducts()); // Refresh list
+          await storageService.deleteProduct(id);
       }
   };
 
   const handleEditClick = (product: Product, e: React.MouseEvent) => {
-      e.stopPropagation(); // Prevent double triggering
+      e.stopPropagation();
       onSelect(product);
   }
 
   const handleCreate = () => {
       const newProduct: Product = {
           id: Math.random().toString(36).substr(2, 9),
-          name: '', // Empty name to start
+          name: '', 
           slug: '',
           shortDescription: '',
           description: '',
@@ -108,7 +114,7 @@ const ProductEditor = ({ product: initialProduct, onBack }: { product: Product; 
   const [isGenerating, setIsGenerating] = useState(false);
   const [showMediaPicker, setShowMediaPicker] = useState(false);
 
-  const handleSave = () => {
+  const handleSave = async () => {
     if (!product.name) return alert("Vui lòng nhập tên sản phẩm");
     setIsSaving(true);
     // If slug is empty, auto-generate from name
@@ -116,11 +122,15 @@ const ProductEditor = ({ product: initialProduct, onBack }: { product: Product; 
         ...product,
         slug: product.slug || product.name.toLowerCase().replace(/ /g, '-').replace(/[^\w-]+/g, '')
     };
-    storageService.saveProduct(finalProduct);
-    setTimeout(() => {
-        setIsSaving(false);
+    try {
+        await storageService.saveProduct(finalProduct);
         onBack();
-    }, 500);
+    } catch (err) {
+        console.error(err);
+        alert('Có lỗi khi lưu sản phẩm');
+    } finally {
+        setIsSaving(false);
+    }
   };
 
   const handleAiGenerate = async () => {
@@ -194,8 +204,8 @@ const ProductEditor = ({ product: initialProduct, onBack }: { product: Product; 
                 {isGenerating ? <Loader2 className="w-4 h-4 mr-2 animate-spin"/> : <Sparkles className="w-4 h-4 mr-2" />}
                 Viết bằng AI
             </Button>
-            <Button onClick={handleSave} className="shadow-lg">
-                <Save className="w-5 h-5 mr-2" />
+            <Button onClick={handleSave} className="shadow-lg" disabled={isSaving}>
+                {isSaving ? <Loader2 className="w-5 h-5 mr-2 animate-spin"/> : <Save className="w-5 h-5 mr-2" />}
                 {isSaving ? 'Đang lưu...' : 'Lưu sản phẩm'}
             </Button>
         </div>
