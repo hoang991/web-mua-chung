@@ -47,8 +47,12 @@ export const Container: React.FC<{ className?: string; children: React.ReactNode
 );
 
 // --- Card ---
-export const Card: React.FC<{ className?: string; children: React.ReactNode }> = ({ className, children }) => (
-  <div className={cn("bg-white rounded-xl shadow-sm border border-stone-100 overflow-hidden", className)}>
+interface CardProps extends React.HTMLAttributes<HTMLDivElement> {
+  children: React.ReactNode;
+}
+
+export const Card: React.FC<CardProps> = ({ className, children, ...props }) => (
+  <div className={cn("bg-white rounded-xl shadow-sm border border-stone-100 overflow-hidden", className)} {...props}>
     {children}
   </div>
 );
