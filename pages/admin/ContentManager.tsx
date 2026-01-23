@@ -3,7 +3,8 @@ import React, { useState, useEffect } from 'react';
 import { storageService } from '../../services/store';
 import { PageData, SectionContent } from '../../types';
 import { Card, Button, Input, Textarea } from '../../components/Shared';
-import { Edit, Save, ArrowLeft, Eye, EyeOff, Layout, ArrowUp, ArrowDown, Globe, Plus, Trash2, Loader2 } from 'lucide-react';
+import { MediaPicker } from './MediaPicker';
+import { Edit, Save, ArrowLeft, Eye, EyeOff, Layout, ArrowUp, ArrowDown, Globe, Plus, Trash2, Loader2, Image as ImageIcon } from 'lucide-react';
 
 const PageList = ({ onSelect }: { onSelect: (slug: string) => void }) => {
   const [pages, setPages] = useState<PageData[]>([]);
@@ -43,6 +44,9 @@ const PageList = ({ onSelect }: { onSelect: (slug: string) => void }) => {
 const PageEditor = ({ slug, onBack }: { slug: string; onBack: () => void }) => {
   const [page, setPage] = useState<PageData | null>(null);
   const [isSaving, setIsSaving] = useState(false);
+  const [showMediaPicker, setShowMediaPicker] = useState(false);
+  // Track which field is requesting an image: { sectionIndex, itemIndex (optional) }
+  const [pickingImageFor, setPickingImageFor] = useState<{sectionIdx: number, itemIdx?: number} | null>(null);
 
   useEffect(() => {
     const data = storageService.getPage(slug);
@@ -121,10 +125,35 @@ const PageEditor = ({ slug, onBack }: { slug: string; onBack: () => void }) => {
       setPage({ ...page, sections: newSections });
   };
 
+  const openImagePicker = (sectionIdx: number, itemIdx?: number) => {
+      setPickingImageFor({ sectionIdx, itemIdx });
+      setShowMediaPicker(true);
+  };
+
+  const handleImageSelect = (url: string) => {
+      if (pickingImageFor) {
+          const { sectionIdx, itemIdx } = pickingImageFor;
+          if (itemIdx !== undefined) {
+              updateSectionItem(sectionIdx, itemIdx, { image: url });
+          } else {
+              updateSection(sectionIdx, { image: url });
+          }
+      }
+      setShowMediaPicker(false);
+      setPickingImageFor(null);
+  };
+
   if (!page) return <div>Loading...</div>;
 
   return (
     <div className="space-y-6 pb-20">
+      {showMediaPicker && (
+          <MediaPicker 
+            onSelect={handleImageSelect} 
+            onClose={() => setShowMediaPicker(false)} 
+          />
+      )}
+
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-4">
             <Button variant="ghost" onClick={onBack} size="sm">
@@ -246,12 +275,30 @@ const PageEditor = ({ slug, onBack }: { slug: string; onBack: () => void }) => {
                                 )}
 
                                 {(section.type === 'image-text' || section.type === 'hero') && (
-                                     <Input 
-                                        label="Link Ảnh (URL)"
-                                        value={section.image || ''}
-                                        placeholder="https://..."
-                                        onChange={(e) => updateSection(idx, { image: e.target.value })}
-                                    />
+                                     <div className="space-y-2">
+                                         <label className="text-sm font-medium text-stone-700">Hình ảnh</label>
+                                         <div className="flex gap-2 items-center">
+                                            <div className="relative flex-1">
+                                                <Input 
+                                                    value={section.image || ''}
+                                                    placeholder="https://..."
+                                                    onChange={(e) => updateSection(idx, { image: e.target.value })}
+                                                />
+                                            </div>
+                                            <Button 
+                                                variant="outline" 
+                                                onClick={() => openImagePicker(idx)}
+                                                className="shrink-0"
+                                            >
+                                                <ImageIcon className="w-4 h-4 mr-2" /> Chọn ảnh
+                                            </Button>
+                                         </div>
+                                         {section.image && (
+                                             <div className="h-24 w-40 bg-stone-100 rounded overflow-hidden border border-stone-200">
+                                                 <img src={section.image} alt="Preview" className="w-full h-full object-cover" />
+                                             </div>
+                                         )}
+                                     </div>
                                 )}
                                 {section.type === 'hero' && (
                                     <div className="grid grid-cols-2 gap-4">

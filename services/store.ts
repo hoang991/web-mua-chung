@@ -159,7 +159,7 @@ const INITIAL_PRODUCTS: Product[] = [
             { minQuantity: 10, price: 135000, label: 'Gom chung (10+)' },
             { minQuantity: 50, price: 120000, label: 'Giá gốc (50+)' }
         ],
-        category: 'Nông sản',
+        category: 'daily',
         status: 'active',
         updatedAt: new Date().toISOString()
     }

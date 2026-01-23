@@ -5,6 +5,7 @@ import { Button, Container, cn } from './Shared';
 import { storageService } from '../services/store';
 import { SiteConfig } from '../types';
 import { FloatingContact } from './FloatingContact';
+import { FloatingNav } from './FloatingNav';
 
 interface LayoutProps {
   children: React.ReactNode;
@@ -202,8 +203,9 @@ export const PublicLayout: React.FC<LayoutProps> = ({ children }) => {
         </Container>
       </footer>
 
-      {/* Floating Action Button */}
+      {/* Floating Action Buttons */}
       <FloatingContact />
+      <FloatingNav />
     </div>
   );
 };

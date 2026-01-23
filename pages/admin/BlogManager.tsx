@@ -5,7 +5,7 @@ import { aiService } from '../../services/mockAI';
 import { BlogPost, BlogCategory } from '../../types';
 import { Card, Button, Input, Textarea } from '../../components/Shared';
 import { MediaPicker } from './MediaPicker';
-import { Plus, Trash2, Edit, Save, ArrowLeft, Image as ImageIcon, Sparkles, Loader2, Pencil, Calendar, Heart, Gift, Coffee, MapPin, ExternalLink } from 'lucide-react';
+import { Plus, Trash2, Edit, Save, ArrowLeft, Image as ImageIcon, Sparkles, Loader2, Pencil, Calendar, Heart, Gift, Coffee, MapPin, ExternalLink, Video } from 'lucide-react';
 
 const BlogList = ({ onSelect }: { onSelect: (post: BlogPost) => void }) => {
   const [posts, setPosts] = useState<BlogPost[]>([]);
@@ -37,6 +37,7 @@ const BlogList = ({ onSelect }: { onSelect: (post: BlogPost) => void }) => {
           excerpt: '',
           content: '',
           coverImage: '',
+          videoUrl: '', // Init videoUrl
           status: 'draft',
           category: 'story', // default category
           createdAt: new Date().toISOString(),
@@ -90,6 +91,7 @@ const BlogList = ({ onSelect }: { onSelect: (post: BlogPost) => void }) => {
                         <span className={`px-2 py-0.5 rounded text-xs font-medium ${catInfo.color}`}>
                             {catInfo.label}
                         </span>
+                        {p.videoUrl && <Video className="w-4 h-4 text-red-500" />}
                     </div>
                     <p className="text-sm text-stone-500 line-clamp-1">{p.excerpt || 'Chưa có mô tả ngắn'}</p>
                     <p className="text-xs text-stone-400 mt-1">
@@ -233,6 +235,16 @@ const BlogEditor = ({ post: initialPost, onBack }: { post: BlogPost; onBack: () 
                         onChange={e => setPost({...post, slug: e.target.value})}
                         placeholder="tu-dong-tao-tu-tieu-de"
                      />
+                     
+                     <div className="bg-stone-50 p-4 rounded-lg border border-stone-200 space-y-2">
+                         <Input 
+                            label="Link Video (Youtube/Vimeo)"
+                            placeholder="https://www.youtube.com/watch?v=..."
+                            value={post.videoUrl || ''}
+                            onChange={e => setPost({...post, videoUrl: e.target.value})}
+                        />
+                        <p className="text-xs text-stone-500">Video sẽ được hiển thị ở đầu bài viết.</p>
+                     </div>
                      
                      {/* Location Fields for Tea Points */}
                      {post.category === 'tea' && (

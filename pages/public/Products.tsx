@@ -4,12 +4,13 @@ import { Link } from 'react-router-dom';
 import { storageService } from '../../services/store';
 import { Product } from '../../types';
 import { Container, Section, Card, Button, FadeIn, cn } from '../../components/Shared';
-import { ShoppingCart, Tag, Check, ArrowRight, ChevronLeft, ChevronRight, X } from 'lucide-react';
+import { ShoppingCart, Tag, Check, ArrowRight, ChevronLeft, ChevronRight, X, Sun, Heart, Brain, LayoutGrid, Coffee } from 'lucide-react';
 
 const Products = () => {
   const [products, setProducts] = useState<Product[]>([]);
   const [activeProduct, setActiveProduct] = useState<string | null>(null);
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
+  const [activeTab, setActiveTab] = useState('all');
 
   useEffect(() => {
     setProducts(storageService.getProducts().filter(p => p.status === 'active'));
@@ -36,13 +37,29 @@ const Products = () => {
     setCurrentImageIndex((prev) => (prev - 1 + total) % total);
   };
 
+  const tabs = [
+      { id: 'all', label: 'Tất cả', icon: LayoutGrid },
+      { id: 'daily', label: 'Giải pháp hàng ngày', icon: Sun },
+      { id: 'health', label: 'Giải pháp sức khỏe', icon: Heart },
+      { id: 'mind', label: 'Giải pháp về tâm trí', icon: Brain },
+  ];
+
+  const filteredProducts = activeTab === 'all' 
+    ? products 
+    : products.filter(p => p.category === activeTab);
+
   const activeItem = products.find(p => p.id === activeProduct);
+
+  const getCategoryLabel = (cat: string) => {
+      const found = tabs.find(t => t.id === cat);
+      return found ? found.label : cat;
+  };
 
   return (
     <>
       <Section className="bg-stone-50 py-12">
         <Container>
-          <div className="text-center mb-12">
+          <div className="text-center mb-8">
             <h1 className="text-3xl md:text-4xl font-bold text-stone-900 mb-4">Vườn giải pháp kỳ này</h1>
             <p className="text-stone-600 max-w-2xl mx-auto text-sm md:text-base">
               Các giải pháp được tuyển chọn kỹ lưỡng từ những nhà sản xuất uy tín. 
@@ -50,9 +67,32 @@ const Products = () => {
             </p>
           </div>
 
+          {/* Tabs Navigation */}
+          <div className="flex flex-wrap justify-center gap-3 md:gap-4 mb-12">
+            {tabs.map(tab => {
+                const Icon = tab.icon;
+                const isActive = activeTab === tab.id;
+                return (
+                    <button
+                        key={tab.id}
+                        onClick={() => setActiveTab(tab.id)}
+                        className={cn(
+                            "flex items-center gap-2 px-4 py-2 rounded-full text-sm md:text-base font-medium transition-all duration-300 border",
+                            isActive 
+                                ? "bg-emerald-600 text-white border-emerald-600 shadow-md transform scale-105" 
+                                : "bg-white text-stone-600 border-stone-200 hover:border-emerald-300 hover:text-emerald-700"
+                        )}
+                    >
+                        <Icon className={cn("w-4 h-4", isActive ? "text-white" : "text-stone-400")} />
+                        {tab.label}
+                    </button>
+                )
+            })}
+          </div>
+
           <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6 md:gap-8">
-            {products.map((product, idx) => (
-              <FadeIn key={product.id} delay={idx * 100}>
+            {filteredProducts.map((product, idx) => (
+              <FadeIn key={product.id} delay={idx * 50}>
                 <Card 
                     className="h-full flex flex-col hover:shadow-lg transition-all duration-300 cursor-pointer group"
                     onClick={() => setActiveProduct(product.id)}
@@ -74,7 +114,7 @@ const Products = () => {
                   <div className="p-4 md:p-6 flex-1 flex flex-col">
                     <div className="mb-2">
                        <span className="text-[10px] md:text-xs font-bold text-emerald-600 uppercase tracking-wider bg-emerald-50 px-2 py-1 rounded-md">
-                           {product.category}
+                           {getCategoryLabel(product.category)}
                        </span>
                     </div>
                     <h3 className="text-lg md:text-xl font-bold text-stone-900 mb-2">{product.name}</h3>
@@ -109,6 +149,14 @@ const Products = () => {
               </FadeIn>
             ))}
           </div>
+
+          {filteredProducts.length === 0 && (
+             <div className="text-center py-20 bg-white rounded-2xl border border-stone-100 border-dashed">
+                <Coffee className="w-16 h-16 mx-auto text-stone-300 mb-4" />
+                <h3 className="text-xl font-bold text-stone-600 mb-2">Chưa có giải pháp nào</h3>
+                <p className="text-stone-500">Mục này đang được chúng tôi cập nhật. Vui lòng quay lại sau.</p>
+             </div>
+          )}
         </Container>
       </Section>
       

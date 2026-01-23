@@ -43,11 +43,20 @@ const ProductList = ({ onSelect }: { onSelect: (product: Product) => void }) => 
           description: '',
           images: [],
           pricing: [{ minQuantity: 1, price: 0, label: 'Giá lẻ' }],
-          category: 'Chung',
+          category: 'daily',
           status: 'inactive',
           updatedAt: new Date().toISOString()
       };
       onSelect(newProduct);
+  };
+
+  const getCategoryLabel = (cat: string) => {
+      switch(cat) {
+          case 'daily': return 'Giải pháp hàng ngày';
+          case 'health': return 'Giải pháp sức khỏe';
+          case 'mind': return 'Giải pháp tâm trí';
+          default: return cat;
+      }
   };
 
   return (
@@ -67,6 +76,9 @@ const ProductList = ({ onSelect }: { onSelect: (product: Product) => void }) => 
                  <h3 className="font-bold text-lg">{p.name || '(Chưa đặt tên)'}</h3>
                  <span className={`px-2 py-0.5 rounded text-xs font-medium uppercase ${p.status === 'active' ? 'bg-green-100 text-green-700' : 'bg-gray-100 text-gray-600'}`}>
                     {p.status}
+                 </span>
+                 <span className="bg-stone-100 text-stone-600 px-2 py-0.5 rounded text-xs font-medium">
+                     {getCategoryLabel(p.category)}
                  </span>
               </div>
               <p className="text-sm text-stone-500 line-clamp-1 mb-1">{p.shortDescription || 'Chưa có mô tả'}</p>
@@ -229,11 +241,19 @@ const ProductEditor = ({ product: initialProduct, onBack }: { product: Product; 
                             onChange={e => setProduct({...product, slug: e.target.value})}
                             placeholder="Tu dong tao neu de trong"
                         />
-                         <Input 
-                            label="Danh mục"
-                            value={product.category}
-                            onChange={e => setProduct({...product, category: e.target.value})}
-                        />
+                         <div>
+                            <label className="text-sm font-medium text-stone-700 block mb-1">Danh mục</label>
+                            <select 
+                                className="w-full border rounded-md p-2 bg-white text-sm"
+                                value={product.category}
+                                onChange={e => setProduct({...product, category: e.target.value})}
+                            >
+                                <option value="daily">Giải pháp hàng ngày</option>
+                                <option value="health">Giải pháp sức khỏe</option>
+                                <option value="mind">Giải pháp về tâm trí</option>
+                                <option value="other">Khác</option>
+                            </select>
+                         </div>
                      </div>
                      <Textarea 
                         label="Mô tả ngắn (Hiển thị ở danh sách)"

@@ -81,6 +81,7 @@ export interface BlogPost {
   excerpt: string;
   content: string; // HTML or Markdown
   coverImage?: string;
+  videoUrl?: string; // New field for Video
   category: BlogCategory;
   status: 'draft' | 'published';
   createdAt: string;
@@ -123,6 +124,7 @@ export interface SupplierPost {
   slug: string;
   content: string;
   coverImage: string;
+  videoUrl?: string; // New field for Video
   status: 'published' | 'draft';
   updatedAt: string;
 }

@@ -1,8 +1,9 @@
+
 import React, { useState, useEffect } from 'react';
 import { storageService } from '../../services/store';
 import { SupplierPost } from '../../types';
 import { Container, Section, Card, Button, FadeIn, Input, Textarea } from '../../components/Shared';
-import { Handshake, TrendingUp, Users, CheckCircle, Loader2 } from 'lucide-react';
+import { Handshake, TrendingUp, Users, CheckCircle, Loader2, Video } from 'lucide-react';
 
 const Supplier = () => {
   const [posts, setPosts] = useState<SupplierPost[]>([]);
@@ -54,6 +55,55 @@ const Supplier = () => {
     }
   };
 
+  const renderVideoPlayer = (url: string) => {
+        if (!url) return null;
+        const cleanUrl = url.trim();
+
+        // 1. Raw Embed Code
+        if (cleanUrl.startsWith('<')) {
+             return (
+                 <div 
+                    className="aspect-video w-full rounded-md overflow-hidden bg-black [&>iframe]:w-full [&>iframe]:h-full" 
+                    dangerouslySetInnerHTML={{__html: cleanUrl}} 
+                 />
+             );
+        }
+
+        // 2. YouTube (Robust Regex)
+        const ytRegExp = /(?:youtube\.com\/(?:[^\/]+\/.+\/|(?:v|e(?:mbed)?)\/|.*[?&]v=|shorts\/)|youtu\.be\/)([^"&?\/\s]{11})/;
+        const ytMatch = cleanUrl.match(ytRegExp);
+        const youtubeId = ytMatch ? ytMatch[1] : null;
+
+        if (youtubeId) {
+            return (
+                <div className="aspect-video w-full bg-black rounded-md overflow-hidden">
+                    <iframe
+                        width="100%"
+                        height="100%"
+                        src={`https://www.youtube.com/embed/${youtubeId}?rel=0&modestbranding=1&playsinline=1&origin=${window.location.origin}`}
+                        title="Video Player"
+                        frameBorder="0"
+                        allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+                        referrerPolicy="strict-origin-when-cross-origin"
+                        allowFullScreen
+                    ></iframe>
+                </div>
+            );
+        }
+
+        // 3. Direct File
+        if (/\.(mp4|webm|ogg)($|\?)/i.test(cleanUrl)) {
+            return (
+                <video controls className="w-full aspect-video bg-black rounded-md">
+                    <source src={cleanUrl} />
+                    Trình duyệt của bạn không hỗ trợ thẻ video.
+                </video>
+            );
+        }
+
+        return null;
+  };
+
   return (
     <>
       {/* Hero */}
@@ -100,16 +150,30 @@ const Supplier = () => {
                   <div className="grid md:grid-cols-2 gap-8">
                       {posts.map(post => (
                           <FadeIn key={post.id}>
-                              <Card className="overflow-hidden flex flex-col md:flex-row h-full">
-                                  {post.coverImage && (
-                                      <div className="md:w-1/3 h-48 md:h-auto">
+                              <Card className="overflow-hidden flex flex-col h-full">
+                                  {/* Prioritize Video if available, else Image */}
+                                  {post.videoUrl ? (
+                                      <div className="w-full">
+                                          {renderVideoPlayer(post.videoUrl)}
+                                      </div>
+                                  ) : post.coverImage && (
+                                      <div className="w-full h-48 md:h-64">
                                           <img src={post.coverImage} alt="" className="w-full h-full object-cover" />
                                       </div>
                                   )}
-                                  <div className="p-6 flex-1">
+                                  
+                                  <div className="p-6 flex-1 flex flex-col">
                                       <h3 className="text-xl font-bold mb-3">{post.title}</h3>
-                                      <div className="prose prose-sm text-stone-600 line-clamp-4 mb-4" dangerouslySetInnerHTML={{ __html: post.content.substring(0, 200) + '...' }} />
-                                      <span className="text-xs text-stone-400">{new Date(post.updatedAt).toLocaleDateString()}</span>
+                                      <div className="prose prose-sm text-stone-600 line-clamp-3 mb-4 flex-1" dangerouslySetInnerHTML={{ __html: post.content.substring(0, 200) + '...' }} />
+                                      
+                                      <div className="flex justify-between items-center mt-auto pt-4 border-t border-stone-100">
+                                          <span className="text-xs text-stone-400">{new Date(post.updatedAt).toLocaleDateString()}</span>
+                                          {post.videoUrl && (
+                                              <span className="text-xs font-bold text-red-600 flex items-center gap-1 uppercase">
+                                                  <Video className="w-3 h-3"/> Video
+                                              </span>
+                                          )}
+                                      </div>
                                   </div>
                               </Card>
                           </FadeIn>
