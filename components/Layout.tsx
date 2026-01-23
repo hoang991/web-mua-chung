@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { Menu, X, Leaf, Users, Heart, Anchor, Shield, LogOut, Settings, LayoutDashboard, FileText, MessageSquare, Image, Palette, Package, Briefcase, Facebook, MessageCircle, Home, Feather } from 'lucide-react';
@@ -45,6 +44,12 @@ export const PublicLayout: React.FC<LayoutProps> = ({ children }) => {
   const menuItems = config.mainMenu
     .filter(item => item.isVisible)
     .sort((a, b) => a.order - b.order);
+
+  const getZaloUrl = (input?: string) => {
+    if (!input) return '#';
+    if (input.startsWith('http')) return input;
+    return `https://zalo.me/${input}`;
+  };
 
   return (
     <div className={cn("min-h-screen flex flex-col text-stone-800 bg-stone-50 selection:bg-emerald-100", activeFontClass)}>
@@ -125,7 +130,7 @@ export const PublicLayout: React.FC<LayoutProps> = ({ children }) => {
                         <a href={config.socialLinks.facebook} className="text-stone-400 hover:text-blue-600"><Facebook className="w-6 h-6"/></a>
                     )}
                     {config.socialLinks.zalo && (
-                        <a href={config.socialLinks.zalo} className="text-stone-400 hover:text-blue-500"><MessageCircle className="w-6 h-6"/></a>
+                        <a href={getZaloUrl(config.socialLinks.zalo)} className="text-stone-400 hover:text-blue-500"><MessageCircle className="w-6 h-6"/></a>
                     )}
                 </div>
                  <p className="text-xs text-stone-500">
@@ -159,7 +164,7 @@ export const PublicLayout: React.FC<LayoutProps> = ({ children }) => {
                     </a>
                 )}
                  {config.socialLinks.zalo && (
-                    <a href={config.socialLinks.zalo} target="_blank" rel="noreferrer" className="text-stone-400 hover:text-white transition-colors">
+                    <a href={getZaloUrl(config.socialLinks.zalo)} target="_blank" rel="noreferrer" className="text-stone-400 hover:text-white transition-colors">
                         <MessageCircle className="w-5 h-5" />
                     </a>
                 )}

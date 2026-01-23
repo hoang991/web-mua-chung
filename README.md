@@ -1,20 +1,50 @@
-<div align="center">
-<img width="1200" height="475" alt="GHBanner" src="https://github.com/user-attachments/assets/0aa67016-6eaf-458a-adb2-6e31a0763ed6" />
-</div>
+# Alo Mua Chung
 
-# Run and deploy your AI Studio app
+Mã nguồn website Alo Mua Chung - Nền tảng mua chung tử tế.
 
-This contains everything you need to run your app locally.
+## Yêu cầu hệ thống
 
-View your app in AI Studio: https://ai.studio/apps/drive/1xIOas6pRP7Uh-M9g500oxkVGAgWeSCCo
+- Node.js (phiên bản 16 trở lên)
+- NPM hoặc Yarn
 
-## Run Locally
+## Cài đặt và Chạy thử (Local)
 
-**Prerequisites:**  Node.js
+1. Tải mã nguồn về máy.
+2. Mở terminal tại thư mục dự án.
+3. Cài đặt các thư viện:
+   ```bash
+   npm install
+   ```
+4. Chạy chế độ phát triển:
+   ```bash
+   npm run dev
+   ```
+   Truy cập `http://localhost:5173` để xem website.
 
+## Đẩy lên GitHub
 
-1. Install dependencies:
-   `npm install`
-2. Set the `GEMINI_API_KEY` in [.env.local](.env.local) to your Gemini API key
-3. Run the app:
-   `npm run dev`
+1. Tạo một repository mới trên GitHub.
+2. Tại thư mục dự án, chạy các lệnh sau:
+   ```bash
+   git init
+   git add .
+   git commit -m "Initial commit"
+   git branch -M main
+   git remote add origin <LINK_REPOSITORY_CUA_BAN>
+   git push -u origin main
+   ```
+
+## Triển khai lên Netlify (Tự động)
+
+1. Đăng nhập Netlify.
+2. Chọn "Add new site" -> "Import from an existing project".
+3. Chọn GitHub và chọn repository bạn vừa tạo.
+4. Tại phần **Build settings**:
+   - Build command: `npm run build`
+   - Publish directory: `dist`
+5. Bấm "Deploy site".
+
+## Cấu hình Supabase
+
+Đảm bảo bạn đã cập nhật `services/supabase.ts` với URL và Key của dự án Supabase của bạn.
+Chạy file SQL trong `SUPABASE_SETUP.sql` tại dashboard Supabase để tạo bảng dữ liệu.

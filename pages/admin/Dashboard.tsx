@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { storageService } from '../../services/store';
 import { FormSubmission, SiteConfig } from '../../types';
@@ -244,15 +243,15 @@ export const SettingsPage = () => {
                       })} 
                     />
                      <Input 
-                      label="Số điện thoại Zalo" 
-                      placeholder="Ví dụ: 0909999999"
+                      label="Link Zalo / Số điện thoại" 
+                      placeholder="Ví dụ: 0909999999 hoặc https://zalo.me/g/..."
                       value={config.socialLinks.zalo || ''} 
                       onChange={e => setConfig({
                           ...config, 
                           socialLinks: { ...config.socialLinks, zalo: e.target.value }
                       })} 
                     />
-                    <p className="text-xs text-stone-500 italic">Hệ thống sẽ tự động tạo link chat Zalo.</p>
+                    <p className="text-xs text-stone-500 italic">Hệ thống sẽ tự động tạo link chat Zalo hoặc Link tham gia nhóm.</p>
                     
                      <Input 
                       label="Telegram Username" 
