@@ -1,7 +1,9 @@
+
 import React from 'react';
 import { Link } from 'react-router-dom';
 import { clsx, type ClassValue } from 'clsx';
 import { twMerge } from 'tailwind-merge';
+import { Video } from 'lucide-react';
 
 export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs));
@@ -124,4 +126,72 @@ export const FadeIn: React.FC<{ children: React.ReactNode; delay?: number }> = (
       {children}
     </div>
   );
+};
+
+// --- UNIVERSAL VIDEO PLAYER ---
+export const VideoPlayer: React.FC<{ url: string, className?: string }> = ({ url, className }) => {
+    if (!url) return null;
+    const cleanUrl = url.trim();
+
+    // 1. Raw Embed Code (iframe/div)
+    if (cleanUrl.startsWith('<')) {
+        return (
+            <div 
+                className={cn("aspect-video w-full rounded-lg overflow-hidden border border-stone-200 shadow-sm bg-black [&>iframe]:w-full [&>iframe]:h-full", className)}
+                dangerouslySetInnerHTML={{__html: cleanUrl}} 
+            />
+        );
+    }
+
+    // 2. YouTube (Robust Regex)
+    const ytRegExp = /(?:youtube\.com\/(?:[^\/]+\/.+\/|(?:v|e(?:mbed)?)\/|.*[?&]v=|shorts\/)|youtu\.be\/)([^"&?\/\s]{11})/;
+    const ytMatch = cleanUrl.match(ytRegExp);
+    const youtubeId = ytMatch ? ytMatch[1] : null;
+
+    if (youtubeId) {
+        // Fix for Error 153: ensure origin is set, use modestbranding, and enablejsapi
+        const origin = typeof window !== 'undefined' ? window.location.origin : '';
+        return (
+            <div className={cn("aspect-video w-full rounded-lg overflow-hidden border border-stone-200 shadow-sm bg-black", className)}>
+                <iframe
+                    width="100%"
+                    height="100%"
+                    src={`https://www.youtube.com/embed/${youtubeId}?rel=0&modestbranding=1&playsinline=1&enablejsapi=1&origin=${origin}`}
+                    title="Video Player"
+                    frameBorder="0"
+                    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+                    referrerPolicy="strict-origin-when-cross-origin"
+                    allowFullScreen
+                    className="w-full h-full"
+                ></iframe>
+            </div>
+        );
+    }
+
+    // 3. Direct Video File
+    if (/\.(mp4|webm|ogg|mov)($|\?)/i.test(cleanUrl)) {
+        return (
+            <div className={cn("w-full rounded-lg overflow-hidden border border-stone-200 shadow-sm bg-black", className)}>
+                <video controls playsInline className="w-full h-auto max-h-[600px]">
+                    <source src={cleanUrl} />
+                    Trình duyệt của bạn không hỗ trợ thẻ video.
+                </video>
+            </div>
+        );
+    }
+
+    // 4. Fallback Link
+    return (
+        <a 
+            href={cleanUrl} 
+            target="_blank" 
+            rel="noreferrer" 
+            className={cn("flex items-center gap-2 p-4 bg-stone-50 rounded-lg text-emerald-700 hover:bg-emerald-50 transition-colors border border-stone-200", className)}
+        >
+            <div className="p-2 bg-emerald-100 rounded-full">
+                <Video className="w-5 h-5" />
+            </div>
+            <span className="font-medium">Xem video tại liên kết này</span>
+        </a>
+    );
 };

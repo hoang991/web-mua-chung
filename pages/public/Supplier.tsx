@@ -2,7 +2,7 @@
 import React, { useState, useEffect } from 'react';
 import { storageService } from '../../services/store';
 import { SupplierPost } from '../../types';
-import { Container, Section, Card, Button, FadeIn, Input, Textarea } from '../../components/Shared';
+import { Container, Section, Card, Button, FadeIn, Input, Textarea, VideoPlayer } from '../../components/Shared';
 import { Handshake, TrendingUp, Users, CheckCircle, Loader2, Video } from 'lucide-react';
 
 const Supplier = () => {
@@ -55,55 +55,6 @@ const Supplier = () => {
     }
   };
 
-  const renderVideoPlayer = (url: string) => {
-        if (!url) return null;
-        const cleanUrl = url.trim();
-
-        // 1. Raw Embed Code
-        if (cleanUrl.startsWith('<')) {
-             return (
-                 <div 
-                    className="aspect-video w-full rounded-md overflow-hidden bg-black [&>iframe]:w-full [&>iframe]:h-full" 
-                    dangerouslySetInnerHTML={{__html: cleanUrl}} 
-                 />
-             );
-        }
-
-        // 2. YouTube (Robust Regex)
-        const ytRegExp = /(?:youtube\.com\/(?:[^\/]+\/.+\/|(?:v|e(?:mbed)?)\/|.*[?&]v=|shorts\/)|youtu\.be\/)([^"&?\/\s]{11})/;
-        const ytMatch = cleanUrl.match(ytRegExp);
-        const youtubeId = ytMatch ? ytMatch[1] : null;
-
-        if (youtubeId) {
-            return (
-                <div className="aspect-video w-full bg-black rounded-md overflow-hidden">
-                    <iframe
-                        width="100%"
-                        height="100%"
-                        src={`https://www.youtube.com/embed/${youtubeId}?rel=0&modestbranding=1&playsinline=1&origin=${window.location.origin}`}
-                        title="Video Player"
-                        frameBorder="0"
-                        allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
-                        referrerPolicy="strict-origin-when-cross-origin"
-                        allowFullScreen
-                    ></iframe>
-                </div>
-            );
-        }
-
-        // 3. Direct File
-        if (/\.(mp4|webm|ogg)($|\?)/i.test(cleanUrl)) {
-            return (
-                <video controls className="w-full aspect-video bg-black rounded-md">
-                    <source src={cleanUrl} />
-                    Trình duyệt của bạn không hỗ trợ thẻ video.
-                </video>
-            );
-        }
-
-        return null;
-  };
-
   return (
     <>
       {/* Hero */}
@@ -154,7 +105,7 @@ const Supplier = () => {
                                   {/* Prioritize Video if available, else Image */}
                                   {post.videoUrl ? (
                                       <div className="w-full">
-                                          {renderVideoPlayer(post.videoUrl)}
+                                          <VideoPlayer url={post.videoUrl} />
                                       </div>
                                   ) : post.coverImage && (
                                       <div className="w-full h-48 md:h-64">

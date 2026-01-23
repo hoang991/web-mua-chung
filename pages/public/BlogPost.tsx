@@ -1,10 +1,10 @@
 
 import React, { useState, useEffect } from 'react';
 import { useParams, Link } from 'react-router-dom';
-import { Container, Section, Button, Card } from '../../components/Shared';
+import { Container, Section, Button, Card, VideoPlayer } from '../../components/Shared';
 import { storageService } from '../../services/store';
 import { BlogPost as BlogPostType } from '../../types';
-import { Calendar, User, ArrowLeft, Share2, Video } from 'lucide-react';
+import { Calendar, User, ArrowLeft, Share2 } from 'lucide-react';
 import { SEOHead } from '../../components/SEO';
 
 const BlogPost = () => {
@@ -31,67 +31,6 @@ const BlogPost = () => {
             </Container>
         </Section>
     );
-
-    // Robust Video Player Logic
-    const renderVideoPlayer = (url: string) => {
-        if (!url) return null;
-        const cleanUrl = url.trim();
-
-        // 1. Raw Embed Code (iframe, div wrappers)
-        if (cleanUrl.startsWith('<')) {
-             return (
-                 <div 
-                    className="aspect-video w-full rounded-lg overflow-hidden border border-stone-200 shadow-sm [&>iframe]:w-full [&>iframe]:h-full" 
-                    dangerouslySetInnerHTML={{__html: cleanUrl}} 
-                 />
-             );
-        }
-
-        // 2. YouTube (Advanced Regex for all formats including Shorts)
-        // Matches: youtube.com/watch?v=ID, youtu.be/ID, youtube.com/embed/ID, youtube.com/shorts/ID
-        const ytRegExp = /(?:youtube\.com\/(?:[^\/]+\/.+\/|(?:v|e(?:mbed)?)\/|.*[?&]v=|shorts\/)|youtu\.be\/)([^"&?\/\s]{11})/;
-        const ytMatch = cleanUrl.match(ytRegExp);
-        const youtubeId = ytMatch ? ytMatch[1] : null;
-
-        if (youtubeId) {
-            return (
-                <div className="aspect-video w-full rounded-lg overflow-hidden border border-stone-200 shadow-sm bg-black">
-                    <iframe
-                        width="100%"
-                        height="100%"
-                        src={`https://www.youtube.com/embed/${youtubeId}?rel=0&modestbranding=1&playsinline=1&origin=${window.location.origin}`}
-                        title="YouTube Video"
-                        frameBorder="0"
-                        allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
-                        referrerPolicy="strict-origin-when-cross-origin"
-                        allowFullScreen
-                    ></iframe>
-                </div>
-            );
-        }
-
-        // 3. Direct Video File (.mp4, .webm, .ogg)
-        if (/\.(mp4|webm|ogg)($|\?)/i.test(cleanUrl)) {
-            return (
-                <div className="w-full rounded-lg overflow-hidden border border-stone-200 shadow-sm bg-black">
-                    <video controls className="w-full h-auto max-h-[500px]">
-                        <source src={cleanUrl} />
-                        Trình duyệt của bạn không hỗ trợ thẻ video.
-                    </video>
-                </div>
-            );
-        }
-
-        // 4. Fallback: Generic Link Button
-        return (
-            <a href={cleanUrl} target="_blank" rel="noreferrer" className="flex items-center gap-2 p-4 bg-stone-50 rounded-lg text-emerald-700 hover:bg-emerald-50 transition-colors border border-stone-200">
-                <div className="p-2 bg-emerald-100 rounded-full">
-                    <Video className="w-5 h-5" />
-                </div>
-                <span className="font-medium">Xem video tại đây</span>
-            </a>
-        );
-    };
 
     return (
         <>
@@ -139,7 +78,7 @@ const BlogPost = () => {
                         {/* Video Section */}
                         {post.videoUrl && (
                             <div className="mb-8">
-                                {renderVideoPlayer(post.videoUrl)}
+                                <VideoPlayer url={post.videoUrl} />
                             </div>
                         )}
 
