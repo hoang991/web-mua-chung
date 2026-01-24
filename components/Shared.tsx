@@ -1,9 +1,10 @@
 
-import React from 'react';
+import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { clsx, type ClassValue } from 'clsx';
 import { twMerge } from 'tailwind-merge';
-import { Video } from 'lucide-react';
+import { Video, Sparkles, X, Loader2, Wand2 } from 'lucide-react';
+import { aiService } from '../services/mockAI';
 
 export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs));
@@ -193,5 +194,102 @@ export const VideoPlayer: React.FC<{ url: string, className?: string }> = ({ url
             </div>
             <span className="font-medium">Xem video tại liên kết này</span>
         </a>
+    );
+};
+
+// --- AI GENERATOR MODAL ---
+interface AIModalProps {
+    isOpen: boolean;
+    onClose: () => void;
+    onGenerate: (text: string) => void;
+    initialPrompt?: string;
+    type?: 'content' | 'title' | 'policy';
+}
+
+export const AIModal: React.FC<AIModalProps> = ({ isOpen, onClose, onGenerate, initialPrompt = '', type = 'content' }) => {
+    const [prompt, setPrompt] = useState(initialPrompt);
+    const [outline, setOutline] = useState('');
+    const [wordCount, setWordCount] = useState(300);
+    const [isGenerating, setIsGenerating] = useState(false);
+
+    if (!isOpen) return null;
+
+    const handleGenerate = async () => {
+        setIsGenerating(true);
+        try {
+            const result: any = await aiService.generateText(prompt, { wordCount, outline, type });
+            // Handle if result is object (from old mock) or string
+            const text = typeof result === 'string' ? result : (result.description || result.content);
+            onGenerate(text);
+            onClose();
+        } catch (e) {
+            alert('Lỗi tạo nội dung AI');
+        } finally {
+            setIsGenerating(false);
+        }
+    };
+
+    return (
+        <div className="fixed inset-0 z-[60] flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm animate-in fade-in">
+            <div className="bg-white rounded-xl shadow-2xl w-full max-w-lg flex flex-col overflow-hidden">
+                <div className="flex justify-between items-center p-4 border-b bg-gradient-to-r from-purple-50 to-white">
+                    <h3 className="text-lg font-bold flex items-center gap-2 text-purple-700">
+                        <Sparkles className="w-5 h-5" /> Trợ lý AI Viết bài
+                    </h3>
+                    <button onClick={onClose} className="p-1 hover:bg-stone-100 rounded-full">
+                        <X className="w-5 h-5 text-stone-500" />
+                    </button>
+                </div>
+                
+                <div className="p-6 space-y-4">
+                    <Input 
+                        label="Chủ đề / Yêu cầu chính"
+                        placeholder="VD: Lợi ích của gạo lứt..."
+                        value={prompt}
+                        onChange={e => setPrompt(e.target.value)}
+                    />
+                    
+                    {type !== 'title' && (
+                        <>
+                            <div className="grid grid-cols-2 gap-4">
+                                <div>
+                                    <label className="text-sm font-medium text-stone-700 block mb-1">Số lượng từ (ước lượng)</label>
+                                    <select 
+                                        className="w-full border rounded-md p-2 bg-white text-sm"
+                                        value={wordCount}
+                                        onChange={e => setWordCount(Number(e.target.value))}
+                                    >
+                                        <option value={100}>Ngắn (~100 từ)</option>
+                                        <option value={300}>Trung bình (~300 từ)</option>
+                                        <option value={500}>Dài (~500 từ)</option>
+                                        <option value={1000}>Chi tiết (~1000 từ)</option>
+                                    </select>
+                                </div>
+                            </div>
+                            
+                            <Textarea 
+                                label="Dàn ý / Ý chính (Tùy chọn)"
+                                placeholder="- Giới thiệu chung&#10;- Lợi ích sức khỏe&#10;- Cách sử dụng"
+                                rows={4}
+                                value={outline}
+                                onChange={e => setOutline(e.target.value)}
+                            />
+                        </>
+                    )}
+                </div>
+
+                <div className="p-4 bg-stone-50 border-t flex justify-end gap-2">
+                    <Button variant="ghost" onClick={onClose}>Hủy</Button>
+                    <Button 
+                        onClick={handleGenerate} 
+                        disabled={isGenerating || !prompt}
+                        className="bg-purple-600 hover:bg-purple-700 text-white"
+                    >
+                        {isGenerating ? <Loader2 className="w-4 h-4 animate-spin mr-2"/> : <Wand2 className="w-4 h-4 mr-2"/>}
+                        {isGenerating ? 'AI đang viết...' : 'Tạo nội dung'}
+                    </Button>
+                </div>
+            </div>
+        </div>
     );
 };

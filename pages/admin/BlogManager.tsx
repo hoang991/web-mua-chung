@@ -1,9 +1,8 @@
 
 import React, { useState, useEffect } from 'react';
 import { storageService } from '../../services/store';
-import { aiService } from '../../services/mockAI';
 import { BlogPost, BlogCategory } from '../../types';
-import { Card, Button, Input, Textarea } from '../../components/Shared';
+import { Card, Button, Input, Textarea, AIModal } from '../../components/Shared';
 import { MediaPicker } from './MediaPicker';
 import { Plus, Trash2, Edit, Save, ArrowLeft, Image as ImageIcon, Sparkles, Loader2, Pencil, Calendar, Heart, Gift, Coffee, MapPin, ExternalLink, Video } from 'lucide-react';
 
@@ -137,8 +136,11 @@ const BlogList = ({ onSelect }: { onSelect: (post: BlogPost) => void }) => {
 const BlogEditor = ({ post: initialPost, onBack }: { post: BlogPost; onBack: () => void }) => {
   const [post, setPost] = useState<BlogPost>(initialPost);
   const [isSaving, setIsSaving] = useState(false);
-  const [isGenerating, setIsGenerating] = useState(false);
   const [showMediaPicker, setShowMediaPicker] = useState(false);
+  
+  // AI State
+  const [aiModalOpen, setAiModalOpen] = useState(false);
+  const [aiTargetField, setAiTargetField] = useState<'content' | 'excerpt' | 'title'>('content');
 
   // Initialize location if it doesn't exist but category is tea
   useEffect(() => {
@@ -169,21 +171,13 @@ const BlogEditor = ({ post: initialPost, onBack }: { post: BlogPost; onBack: () 
     }
   };
 
-  const handleAiGenerate = async () => {
-      if (!post.title) return alert("Vui lòng nhập tiêu đề bài viết để AI có thể viết nội dung.");
-      setIsGenerating(true);
-      try {
-          const content = await aiService.generateSupplierPost(post.title); // Reusing supplier generation for now as structure is similar
-          setPost(prev => ({
-              ...prev,
-              content: content,
-              excerpt: "Bài viết được tạo tự động bởi AI..."
-          }));
-      } catch (error) {
-          alert("Lỗi khi tạo nội dung");
-      } finally {
-          setIsGenerating(false);
-      }
+  const openAiModal = (field: 'content' | 'excerpt' | 'title') => {
+      setAiTargetField(field);
+      setAiModalOpen(true);
+  };
+
+  const handleAiGenerated = (text: string) => {
+      setPost(prev => ({ ...prev, [aiTargetField]: text }));
   };
 
   const handleImageSelect = (url: string) => {
@@ -199,6 +193,14 @@ const BlogEditor = ({ post: initialPost, onBack }: { post: BlogPost; onBack: () 
           />
       )}
 
+      <AIModal 
+        isOpen={aiModalOpen}
+        onClose={() => setAiModalOpen(false)}
+        onGenerate={handleAiGenerated}
+        initialPrompt={post.title || ''}
+        type={aiTargetField === 'title' ? 'title' : 'content'}
+      />
+
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-4">
             <Button variant="ghost" onClick={onBack} size="sm">
@@ -209,10 +211,6 @@ const BlogEditor = ({ post: initialPost, onBack }: { post: BlogPost; onBack: () 
             </h1>
         </div>
         <div className="flex gap-2">
-             <Button onClick={handleAiGenerate} variant="secondary" disabled={isGenerating} className="bg-purple-100 text-purple-700 hover:bg-purple-200">
-                {isGenerating ? <Loader2 className="w-4 h-4 mr-2 animate-spin"/> : <Sparkles className="w-4 h-4 mr-2" />}
-                Viết bằng AI
-            </Button>
             <Button onClick={handleSave} className="shadow-lg" disabled={isSaving}>
                 {isSaving ? <Loader2 className="w-5 h-5 mr-2 animate-spin"/> : <Save className="w-5 h-5 mr-2" />}
                 {isSaving ? 'Đang lưu...' : 'Lưu bài viết'}
@@ -224,11 +222,16 @@ const BlogEditor = ({ post: initialPost, onBack }: { post: BlogPost; onBack: () 
           <div className="lg:col-span-2 space-y-6">
              <Card className="p-6">
                  <div className="space-y-4">
-                     <Input 
-                        label="Tiêu đề bài viết"
-                        value={post.title}
-                        onChange={e => setPost({...post, title: e.target.value})}
-                     />
+                     <div>
+                        <div className="flex justify-between items-center mb-1">
+                            <label className="text-sm font-medium text-stone-700">Tiêu đề bài viết</label>
+                            <button onClick={() => openAiModal('title')} className="text-xs text-purple-600 flex items-center gap-1 hover:underline"><Sparkles className="w-3 h-3"/> AI Gợi ý</button>
+                        </div>
+                        <Input 
+                            value={post.title}
+                            onChange={e => setPost({...post, title: e.target.value})}
+                        />
+                     </div>
                      <Input 
                         label="Đường dẫn (Slug)"
                         value={post.slug}
@@ -305,19 +308,30 @@ const BlogEditor = ({ post: initialPost, onBack }: { post: BlogPost; onBack: () 
                          </div>
                     )}
 
-                     <Textarea 
-                        label="Mô tả ngắn (Excerpt)"
-                        value={post.excerpt}
-                        onChange={e => setPost({...post, excerpt: e.target.value})}
-                        rows={3}
-                     />
-                     <Textarea 
-                        label="Nội dung chi tiết (HTML/Markdown)"
-                        value={post.content}
-                        onChange={e => setPost({...post, content: e.target.value})}
-                        rows={15}
-                        className="font-mono text-sm"
-                     />
+                     <div>
+                        <div className="flex justify-between items-center mb-1">
+                            <label className="text-sm font-medium text-stone-700">Mô tả ngắn (Excerpt)</label>
+                            <button onClick={() => openAiModal('excerpt')} className="text-xs text-purple-600 flex items-center gap-1 hover:underline"><Sparkles className="w-3 h-3"/> AI Viết</button>
+                        </div>
+                        <Textarea 
+                            value={post.excerpt}
+                            onChange={e => setPost({...post, excerpt: e.target.value})}
+                            rows={3}
+                        />
+                     </div>
+
+                     <div>
+                        <div className="flex justify-between items-center mb-1">
+                            <label className="text-sm font-medium text-stone-700">Nội dung chi tiết (HTML/Markdown)</label>
+                            <button onClick={() => openAiModal('content')} className="text-xs text-purple-600 flex items-center gap-1 hover:underline"><Sparkles className="w-3 h-3"/> AI Viết</button>
+                        </div>
+                        <Textarea 
+                            value={post.content}
+                            onChange={e => setPost({...post, content: e.target.value})}
+                            rows={15}
+                            className="font-mono text-sm"
+                        />
+                     </div>
                  </div>
              </Card>
           </div>

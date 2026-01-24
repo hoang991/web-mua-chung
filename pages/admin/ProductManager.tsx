@@ -1,9 +1,8 @@
 
 import React, { useState, useEffect } from 'react';
 import { storageService } from '../../services/store';
-import { aiService } from '../../services/mockAI';
 import { Product, PricingTier } from '../../types';
-import { Card, Button, Input, Textarea } from '../../components/Shared';
+import { Card, Button, Input, Textarea, AIModal } from '../../components/Shared';
 import { MediaPicker } from './MediaPicker';
 import { Plus, Trash2, Edit, Save, ArrowLeft, Image as ImageIcon, Sparkles, Loader2, Pencil } from 'lucide-react';
 
@@ -123,8 +122,11 @@ const ProductList = ({ onSelect }: { onSelect: (product: Product) => void }) => 
 const ProductEditor = ({ product: initialProduct, onBack }: { product: Product; onBack: () => void }) => {
   const [product, setProduct] = useState<Product>(initialProduct);
   const [isSaving, setIsSaving] = useState(false);
-  const [isGenerating, setIsGenerating] = useState(false);
   const [showMediaPicker, setShowMediaPicker] = useState(false);
+  
+  // AI Modal State
+  const [aiModalOpen, setAiModalOpen] = useState(false);
+  const [aiTargetField, setAiTargetField] = useState<'description' | 'shortDescription'>('description');
 
   const handleSave = async () => {
     if (!product.name) return alert("Vui lòng nhập tên sản phẩm");
@@ -145,21 +147,13 @@ const ProductEditor = ({ product: initialProduct, onBack }: { product: Product; 
     }
   };
 
-  const handleAiGenerate = async () => {
-      if (!product.name) return alert("Vui lòng nhập tên sản phẩm trước để AI viết nội dung.");
-      setIsGenerating(true);
-      try {
-          const content = await aiService.generateProductContent(product.name);
-          setProduct(prev => ({
-              ...prev,
-              shortDescription: content.shortDescription,
-              description: content.description
-          }));
-      } catch (error) {
-          alert("Lỗi khi tạo nội dung");
-      } finally {
-          setIsGenerating(false);
-      }
+  const openAiModal = (field: 'description' | 'shortDescription') => {
+      setAiTargetField(field);
+      setAiModalOpen(true);
+  };
+
+  const handleAiGenerated = (text: string) => {
+      setProduct(prev => ({ ...prev, [aiTargetField]: text }));
   };
 
   const updatePricing = (idx: number, field: keyof PricingTier, value: any) => {
@@ -201,6 +195,13 @@ const ProductEditor = ({ product: initialProduct, onBack }: { product: Product; 
             onClose={() => setShowMediaPicker(false)} 
           />
       )}
+      
+      <AIModal 
+        isOpen={aiModalOpen}
+        onClose={() => setAiModalOpen(false)}
+        onGenerate={handleAiGenerated}
+        initialPrompt={product.name ? `Viết nội dung cho sản phẩm: ${product.name}` : ''}
+      />
 
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-4">
@@ -212,10 +213,6 @@ const ProductEditor = ({ product: initialProduct, onBack }: { product: Product; 
             </h1>
         </div>
         <div className="flex gap-2">
-            <Button onClick={handleAiGenerate} variant="secondary" disabled={isGenerating} className="bg-purple-100 text-purple-700 hover:bg-purple-200">
-                {isGenerating ? <Loader2 className="w-4 h-4 mr-2 animate-spin"/> : <Sparkles className="w-4 h-4 mr-2" />}
-                Viết bằng AI
-            </Button>
             <Button onClick={handleSave} className="shadow-lg" disabled={isSaving}>
                 {isSaving ? <Loader2 className="w-5 h-5 mr-2 animate-spin"/> : <Save className="w-5 h-5 mr-2" />}
                 {isSaving ? 'Đang lưu...' : 'Lưu sản phẩm'}
@@ -250,26 +247,34 @@ const ProductEditor = ({ product: initialProduct, onBack }: { product: Product; 
                             >
                                 <option value="daily">Giải pháp hàng ngày</option>
                                 <option value="health">Giải pháp sức khỏe</option>
-                                <option value="mind">Giải pháp về tâm trí</option>
-                                <option value="other">Khác</option>
+                                <option value="mind">Giải pháp tâm trí</option>
                             </select>
                          </div>
                      </div>
-                     <Textarea 
-                        label="Mô tả ngắn (Hiển thị ở danh sách)"
-                        value={product.shortDescription}
-                        onChange={e => setProduct({...product, shortDescription: e.target.value})}
-                        rows={3}
-                     />
-                     <div className="relative">
+                     
+                     <div>
+                        <div className="flex justify-between items-center mb-1">
+                            <label className="text-sm font-medium text-stone-700">Mô tả ngắn</label>
+                            <button onClick={() => openAiModal('shortDescription')} className="text-xs text-purple-600 flex items-center gap-1 hover:underline"><Sparkles className="w-3 h-3"/> AI Viết</button>
+                        </div>
                         <Textarea 
-                            label="Nội dung chi tiết (HTML/Text)"
+                            value={product.shortDescription}
+                            onChange={e => setProduct({...product, shortDescription: e.target.value})}
+                            rows={3}
+                        />
+                     </div>
+
+                     <div>
+                        <div className="flex justify-between items-center mb-1">
+                            <label className="text-sm font-medium text-stone-700">Nội dung chi tiết (HTML)</label>
+                             <button onClick={() => openAiModal('description')} className="text-xs text-purple-600 flex items-center gap-1 hover:underline"><Sparkles className="w-3 h-3"/> AI Viết</button>
+                        </div>
+                        <Textarea 
                             value={product.description}
                             onChange={e => setProduct({...product, description: e.target.value})}
                             rows={15}
                             className="font-mono text-sm"
                         />
-                         <p className="text-xs text-stone-400 mt-1">Gợi ý: Dùng nút "Viết bằng AI" ở trên để tự động tạo nội dung hấp dẫn.</p>
                      </div>
                  </div>
              </Card>

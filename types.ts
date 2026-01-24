@@ -1,7 +1,6 @@
 
-
 export type ThemeColor = 'emerald' | 'blue' | 'rose' | 'amber' | 'slate' | 'violet';
-export type ThemeFont = 'inter' | 'serif' | 'mono';
+export type ThemeFont = 'inter' | 'serif' | 'mono' | 'merriweather' | 'playfair' | 'roboto' | 'patrick' | 'dancing';
 
 export interface MenuLink {
   id: string;

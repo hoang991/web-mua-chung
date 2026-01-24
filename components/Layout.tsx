@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { Menu, X, Leaf, Users, Heart, Anchor, Shield, LogOut, Settings, LayoutDashboard, FileText, MessageSquare, Image, Palette, Package, Briefcase, Facebook, MessageCircle, Home, Feather } from 'lucide-react';
@@ -21,10 +22,16 @@ const themeColors: Record<string, string> = {
     violet: "text-violet-700 bg-violet-50 hover:bg-violet-100",
 };
 
+// Map to CSS Font Family strings
 const fontFamilies: Record<string, string> = {
-    inter: "font-sans",
-    serif: "font-serif",
-    mono: "font-mono"
+    inter: "'Inter', sans-serif",
+    serif: "serif",
+    mono: "monospace",
+    merriweather: "'Merriweather', serif",
+    playfair: "'Playfair Display', serif",
+    roboto: "'Roboto', sans-serif",
+    patrick: "'Patrick Hand', cursive",
+    dancing: "'Dancing Script', cursive",
 };
 
 export const PublicLayout: React.FC<LayoutProps> = ({ children }) => {
@@ -37,10 +44,8 @@ export const PublicLayout: React.FC<LayoutProps> = ({ children }) => {
     setIsMenuOpen(false); // Close menu on route change
   }, [location.pathname]);
 
-  // Removed body scroll lock since we are using dropdown menu instead of overlay
-
   const activeColorClass = themeColors[config.primaryColor] || themeColors.emerald;
-  const activeFontClass = fontFamilies[config.font] || fontFamilies.inter;
+  const activeFontFamily = fontFamilies[config.font] || fontFamilies.inter;
 
   const menuItems = config.mainMenu
     .filter(item => item.isVisible)
@@ -53,7 +58,10 @@ export const PublicLayout: React.FC<LayoutProps> = ({ children }) => {
   };
 
   return (
-    <div className={cn("min-h-screen flex flex-col text-stone-800 bg-stone-50 selection:bg-emerald-100", activeFontClass)}>
+    <div 
+        className={cn("min-h-screen flex flex-col text-stone-800 bg-stone-50 selection:bg-emerald-100")}
+        style={{ fontFamily: activeFontFamily }}
+    >
       {/* Header */}
       <header className="sticky top-0 z-50 w-full bg-white/95 backdrop-blur-md border-b border-stone-100 transition-all duration-200">
         <Container className="flex h-16 md:h-20 items-center justify-between">

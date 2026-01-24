@@ -32,8 +32,13 @@ export const ThemeCustomizer = () => {
   ];
 
   const fonts: {id: ThemeFont, name: string}[] = [
-      { id: 'inter', name: 'Inter (Hiện đại)' },
+      { id: 'inter', name: 'Inter (Hiện đại - Mặc định)' },
       { id: 'serif', name: 'Serif (Trang trọng)' },
+      { id: 'merriweather', name: 'Merriweather (Báo chí/Blog)' },
+      { id: 'playfair', name: 'Playfair (Sang trọng)' },
+      { id: 'roboto', name: 'Roboto (Google Standard)' },
+      { id: 'patrick', name: 'Patrick Hand (Viết tay - Cute)' },
+      { id: 'dancing', name: 'Dancing Script (Nghệ thuật)' },
       { id: 'mono', name: 'Mono (Kỹ thuật)' },
   ];
 
@@ -87,14 +92,21 @@ export const ThemeCustomizer = () => {
 
               <Card className="p-6">
                   <h3 className="font-bold text-lg mb-4 flex items-center gap-2"><Type className="w-5 h-5"/> Phông chữ</h3>
-                  <div className="space-y-2">
+                  <div className="space-y-2 max-h-80 overflow-y-auto custom-scrollbar">
                       {fonts.map(f => (
                           <div 
                             key={f.id}
                             onClick={() => setConfig({...config, font: f.id})}
                             className={`p-3 rounded border cursor-pointer flex justify-between items-center ${config.font === f.id ? 'border-emerald-500 bg-emerald-50' : 'border-stone-200 hover:bg-stone-50'}`}
                           >
-                              <span className={f.id === 'serif' ? 'font-serif' : f.id === 'mono' ? 'font-mono' : 'font-sans'}>{f.name}</span>
+                              <span style={{ 
+                                fontFamily: f.id === 'merriweather' ? "'Merriweather', serif" :
+                                            f.id === 'playfair' ? "'Playfair Display', serif" :
+                                            f.id === 'patrick' ? "'Patrick Hand', cursive" :
+                                            f.id === 'dancing' ? "'Dancing Script', cursive" :
+                                            f.id === 'roboto' ? "'Roboto', sans-serif" :
+                                            'inherit'
+                              }}>{f.name}</span>
                               {config.font === f.id && <div className="w-3 h-3 bg-emerald-500 rounded-full" />}
                           </div>
                       ))}

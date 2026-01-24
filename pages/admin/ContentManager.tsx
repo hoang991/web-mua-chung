@@ -2,9 +2,9 @@
 import React, { useState, useEffect } from 'react';
 import { storageService } from '../../services/store';
 import { PageData, SectionContent } from '../../types';
-import { Card, Button, Input, Textarea } from '../../components/Shared';
+import { Card, Button, Input, Textarea, AIModal } from '../../components/Shared';
 import { MediaPicker } from './MediaPicker';
-import { Edit, Save, ArrowLeft, Eye, EyeOff, Layout, ArrowUp, ArrowDown, Globe, Plus, Trash2, Loader2, Image as ImageIcon } from 'lucide-react';
+import { Edit, Save, ArrowLeft, Eye, EyeOff, Layout, ArrowUp, ArrowDown, Globe, Plus, Trash2, Loader2, Image as ImageIcon, Sparkles } from 'lucide-react';
 
 const PageList = ({ onSelect }: { onSelect: (slug: string) => void }) => {
   const [pages, setPages] = useState<PageData[]>([]);
@@ -48,6 +48,11 @@ const PageEditor = ({ slug, onBack }: { slug: string; onBack: () => void }) => {
   // Track which field is requesting an image: { sectionIndex, itemIndex (optional) }
   const [pickingImageFor, setPickingImageFor] = useState<{sectionIdx: number, itemIdx?: number} | null>(null);
 
+  // AI State
+  const [aiModalOpen, setAiModalOpen] = useState(false);
+  // Target for AI: { sectionIdx, field: 'content' | 'subtitle' }
+  const [aiTarget, setAiTarget] = useState<{sectionIdx: number, field: 'content' | 'subtitle' | 'title'} | null>(null);
+
   useEffect(() => {
     const data = storageService.getPage(slug);
     if (data) setPage(data);
@@ -64,6 +69,17 @@ const PageEditor = ({ slug, onBack }: { slug: string; onBack: () => void }) => {
     } finally {
         setIsSaving(false);
     }
+  };
+
+  const openAiModal = (sectionIdx: number, field: 'content' | 'subtitle' | 'title') => {
+      setAiTarget({ sectionIdx, field });
+      setAiModalOpen(true);
+  };
+
+  const handleAiGenerated = (text: string) => {
+      if (aiTarget && page) {
+          updateSection(aiTarget.sectionIdx, { [aiTarget.field]: text });
+      }
   };
 
   const updateSection = (idx: number, updates: Partial<SectionContent>) => {
@@ -154,6 +170,14 @@ const PageEditor = ({ slug, onBack }: { slug: string; onBack: () => void }) => {
           />
       )}
 
+      <AIModal 
+        isOpen={aiModalOpen}
+        onClose={() => setAiModalOpen(false)}
+        onGenerate={handleAiGenerated}
+        initialPrompt={aiTarget ? page.sections[aiTarget.sectionIdx].title : ''}
+        type={slug === 'privacy' || slug === 'terms' ? 'policy' : 'content'}
+      />
+
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-4">
             <Button variant="ghost" onClick={onBack} size="sm">
@@ -208,12 +232,19 @@ const PageEditor = ({ slug, onBack }: { slug: string; onBack: () => void }) => {
                                     onChange={(e) => updateSection(idx, { title: e.target.value })}
                                 />
                                 {section.type !== 'diagram' && section.type !== 'timeline' && (
-                                    <Textarea 
-                                        label={section.type === 'hero' ? 'Mô tả ngắn (Subtitle)' : 'Nội dung chi tiết'}
-                                        value={section.subtitle || section.content || ''}
-                                        onChange={(e) => section.type === 'hero' ? updateSection(idx, { subtitle: e.target.value }) : updateSection(idx, { content: e.target.value })}
-                                        rows={3}
-                                    />
+                                    <div className="relative">
+                                         <div className="flex justify-between items-center mb-1">
+                                            <label className="text-sm font-medium text-stone-700">
+                                                {section.type === 'hero' ? 'Mô tả ngắn (Subtitle)' : 'Nội dung chi tiết'}
+                                            </label>
+                                            <button onClick={() => openAiModal(idx, section.type === 'hero' ? 'subtitle' : 'content')} className="text-xs text-purple-600 flex items-center gap-1 hover:underline"><Sparkles className="w-3 h-3"/> AI Viết</button>
+                                        </div>
+                                        <Textarea 
+                                            value={section.subtitle || section.content || ''}
+                                            onChange={(e) => section.type === 'hero' ? updateSection(idx, { subtitle: e.target.value }) : updateSection(idx, { content: e.target.value })}
+                                            rows={3}
+                                        />
+                                    </div>
                                 )}
                                 {section.type === 'timeline' && (
                                      <Textarea 
