@@ -142,7 +142,9 @@ const PostEditor = ({ post: initialPost, onBack }: { post: SupplierPost; onBack:
       }
   };
 
-  const handleImageSelect = (url: string) => {
+  const handleImageSelect = (result: any) => {
+    // Take first image if array
+    const url = Array.isArray(result) ? result[0] : result;
     setPost({ ...post, coverImage: url });
   };
 

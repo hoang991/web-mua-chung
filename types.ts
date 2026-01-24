@@ -18,6 +18,8 @@ export interface SiteConfig {
   font: ThemeFont;
   seoTitle: string;
   seoDescription: string;
+  // Feature Toggles
+  showTetDecorations?: boolean; // New Flag for Tet
   socialLinks: {
     facebook?: string;
     zalo?: string;
@@ -148,6 +150,7 @@ export const DEFAULT_CONFIG: SiteConfig = {
   font: "inter",
   seoTitle: "Alo Mua Chung - Cộng Đồng Tiêu Dùng Thông Minh",
   seoDescription: "Nền tảng kết nối người dùng, Trưởng Nhóm Khu Vực và Nhà sản xuất tử tế. Không bán lẻ, không đa cấp.",
+  showTetDecorations: true, // Default to true for current season
   socialLinks: {},
   aiKeys: {},
   mainMenu: [

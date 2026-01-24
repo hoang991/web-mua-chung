@@ -38,15 +38,15 @@ export const MediaLibrary = () => {
   };
 
   const handleFileUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
-      const file = e.target.files?.[0];
-      if (!file) return;
+      const files = e.target.files;
+      if (!files || files.length === 0) return;
 
       setIsUploading(true);
       try {
-          const url = await storageService.uploadImage(file);
-          if (!url) {
-              alert("Lỗi khi tải ảnh lên. Vui lòng thử lại.");
-          }
+          const fileList = Array.from(files) as File[];
+          await storageService.uploadFiles(fileList);
+      } catch (err) {
+          alert("Lỗi khi tải ảnh lên. Vui lòng thử lại.");
       } finally {
           setIsUploading(false);
           // Reset input
@@ -80,6 +80,7 @@ export const MediaLibrary = () => {
                 id="file-upload" 
                 className="hidden" 
                 accept="image/*"
+                multiple // Enable multiple files
                 onChange={handleFileUpload}
                 disabled={isUploading}
              />
@@ -93,7 +94,7 @@ export const MediaLibrary = () => {
                  <span className="font-bold text-stone-700">
                      {isUploading ? 'Đang tải lên...' : 'Tải ảnh lên từ máy tính'}
                  </span>
-                 <span className="text-xs text-stone-400">JPG, PNG, GIF (Max 5MB)</span>
+                 <span className="text-xs text-stone-400">Chọn nhiều ảnh cùng lúc (JPG, PNG, GIF)</span>
              </label>
           </Card>
 

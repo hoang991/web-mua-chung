@@ -589,10 +589,9 @@ export const storageService = {
     notify();
   },
 
-  // NEW: Upload file to Supabase Storage
+  // Upload SINGLE file
   uploadImage: async (file: File): Promise<string | null> => {
       try {
-          // 1. Upload to bucket
           const fileName = `${Date.now()}-${file.name.replace(/[^a-zA-Z0-9.]/g, '_')}`;
           const { data, error } = await supabase.storage.from('images').upload(fileName, file);
           
@@ -601,10 +600,8 @@ export const storageService = {
               return null;
           }
 
-          // 2. Get Public URL
           const { data: { publicUrl } } = supabase.storage.from('images').getPublicUrl(fileName);
 
-          // 3. Add to Media Library Database automatically
           await storageService.addMedia({
               name: file.name,
               url: publicUrl,
@@ -616,6 +613,18 @@ export const storageService = {
           console.error("Exception uploading:", e);
           return null;
       }
+  },
+
+  // NEW: Upload MULTIPLE files
+  uploadFiles: async (files: File[]): Promise<string[]> => {
+      const urls: string[] = [];
+      for (const file of files) {
+          const url = await storageService.uploadImage(file);
+          if (url) {
+              urls.push(url);
+          }
+      }
+      return urls;
   },
 
   deleteMedia: async (id: string) => {

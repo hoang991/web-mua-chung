@@ -146,7 +146,10 @@ const PageEditor = ({ slug, onBack }: { slug: string; onBack: () => void }) => {
       setShowMediaPicker(true);
   };
 
-  const handleImageSelect = (url: string) => {
+  const handleImageSelect = (result: any) => {
+      // Content Manager only uses single images
+      const url = Array.isArray(result) ? result[0] : result;
+
       if (pickingImageFor) {
           const { sectionIdx, itemIdx } = pickingImageFor;
           if (itemIdx !== undefined) {

@@ -3,7 +3,7 @@ import React, { useState } from 'react';
 import { storageService } from '../../services/store';
 import { SiteConfig, ThemeColor, ThemeFont } from '../../types';
 import { Card, Button, Input } from '../../components/Shared';
-import { Palette, Type, Save, Menu as MenuIcon, Eye, EyeOff, ArrowUp, ArrowDown, Loader2 } from 'lucide-react';
+import { Palette, Type, Save, Menu as MenuIcon, Eye, EyeOff, ArrowUp, ArrowDown, Loader2, Flower2 } from 'lucide-react';
 
 export const ThemeCustomizer = () => {
   const [config, setConfig] = useState<SiteConfig>(storageService.getConfig());
@@ -74,6 +74,28 @@ export const ThemeCustomizer = () => {
 
       <div className="grid md:grid-cols-2 gap-8">
           <div className="space-y-6">
+              {/* Feature Toggle */}
+              <Card className="p-6 bg-gradient-to-r from-red-50 to-pink-50 border-pink-100">
+                  <h3 className="font-bold text-lg mb-4 flex items-center gap-2 text-pink-700">
+                      <Flower2 className="w-5 h-5"/> Không khí Lễ Tết
+                  </h3>
+                  <div className="flex items-center justify-between">
+                      <div>
+                          <p className="font-medium text-stone-800">Cành đào Tết</p>
+                          <p className="text-sm text-stone-500">Hiển thị 2 cành đào trang trí ở góc trái/phải Header.</p>
+                      </div>
+                      <label className="relative inline-flex items-center cursor-pointer">
+                          <input 
+                            type="checkbox" 
+                            className="sr-only peer" 
+                            checked={config.showTetDecorations || false}
+                            onChange={(e) => setConfig({...config, showTetDecorations: e.target.checked})}
+                          />
+                          <div className="w-11 h-6 bg-stone-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-pink-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-pink-600"></div>
+                      </label>
+                  </div>
+              </Card>
+
               <Card className="p-6">
                   <h3 className="font-bold text-lg mb-4 flex items-center gap-2"><Palette className="w-5 h-5"/> Màu chủ đạo</h3>
                   <div className="flex gap-4 flex-wrap">

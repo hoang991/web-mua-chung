@@ -187,8 +187,14 @@ const ProductEditor = ({ product: initialProduct, onBack }: { product: Product; 
       });
   };
 
-  const handleImageSelect = (url: string) => {
-       setProduct({ ...product, images: [...product.images, url] });
+  const handleImageSelect = (result: any) => {
+       if (Array.isArray(result)) {
+           // Multiple images
+           setProduct({ ...product, images: [...product.images, ...result] });
+       } else {
+           // Single image
+           setProduct({ ...product, images: [...product.images, result] });
+       }
   };
 
   const removeImage = (idx: number) => {
@@ -204,6 +210,7 @@ const ProductEditor = ({ product: initialProduct, onBack }: { product: Product; 
           <MediaPicker 
             onSelect={handleImageSelect} 
             onClose={() => setShowMediaPicker(false)} 
+            allowMultiple={true} // Allow picking multiple images
           />
       )}
       

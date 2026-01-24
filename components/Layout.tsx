@@ -7,6 +7,7 @@ import { storageService } from '../services/store';
 import { SiteConfig } from '../types';
 import { FloatingContact } from './FloatingContact';
 import { FloatingNav } from './FloatingNav';
+import { TetDecorations } from './TetDecorations';
 
 interface LayoutProps {
   children: React.ReactNode;
@@ -64,7 +65,10 @@ export const PublicLayout: React.FC<LayoutProps> = ({ children }) => {
     >
       {/* Header */}
       <header className="sticky top-0 z-50 w-full bg-white/95 backdrop-blur-md border-b border-stone-100 transition-all duration-200">
-        <Container className="flex h-16 md:h-20 items-center justify-between">
+        {/* Tet Decorations - Render conditionally */}
+        {config.showTetDecorations && <TetDecorations />}
+
+        <Container className="flex h-16 md:h-20 items-center justify-between relative z-50">
           <Link to="/" className="flex items-center gap-2 group z-50 relative">
             <div className={cn("p-2 rounded-full transition-colors", activeColorClass)}>
               <Leaf className="w-6 h-6" />
@@ -106,7 +110,7 @@ export const PublicLayout: React.FC<LayoutProps> = ({ children }) => {
         {/* Mobile Nav Dropdown (No Overlay) */}
         <div 
             className={cn(
-                "md:hidden absolute top-full left-0 w-full bg-white border-b border-stone-200 shadow-xl overflow-hidden transition-all duration-300 ease-in-out origin-top",
+                "md:hidden absolute top-full left-0 w-full bg-white border-b border-stone-200 shadow-xl overflow-hidden transition-all duration-300 ease-in-out origin-top z-40",
                 isMenuOpen ? "max-h-[80vh] opacity-100" : "max-h-0 opacity-0"
             )}
         >

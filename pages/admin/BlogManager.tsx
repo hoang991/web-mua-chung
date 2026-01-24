@@ -193,7 +193,10 @@ const BlogEditor = ({ post: initialPost, onBack }: { post: BlogPost; onBack: () 
       }
   };
 
-  const handleImageSelect = (url: string) => {
+  const handleImageSelect = (result: any) => {
+    // MediaPicker returns string | string[] depending on mode.
+    // Blog post only has one coverImage, so we take the first one if it's an array.
+    const url = Array.isArray(result) ? result[0] : result;
     setPost({ ...post, coverImage: url });
   };
 
