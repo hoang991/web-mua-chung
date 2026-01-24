@@ -1,5 +1,5 @@
 
-import { SiteConfig, FormSubmission, DEFAULT_CONFIG, PageData, MediaItem, BlogPost, Product, SupplierPost } from '../types';
+import { SiteConfig, FormSubmission, DEFAULT_CONFIG, PageData, MediaItem, BlogPost, Product, SupplierPost, SectionContent } from '../types';
 import { supabase } from './supabase';
 
 // Keys for LocalStorage (Fallback)
@@ -383,6 +383,56 @@ export const storageService = {
         const { data: pagesData } = await supabase.from('pages').select('*');
         if (pagesData && pagesData.length > 0) {
             cache.pages = pagesData.map(p => ({ ...p.data, slug: p.slug }));
+            
+            // FIX: Ensure Home page has all dynamic sections for Admin reordering
+            const homePage = cache.pages.find(p => p.slug === 'home');
+            if (homePage) {
+                const existingIds = new Set(homePage.sections.map((s: SectionContent) => s.id));
+                const missingSections: SectionContent[] = [];
+
+                if (!existingIds.has('products')) {
+                    missingSections.push({
+                        id: 'products',
+                        type: 'products',
+                        title: 'Vườn giải pháp kỳ này',
+                        subtitle: 'Các giải pháp được tuyển chọn kỹ lưỡng từ những nhà sản xuất uy tín. Đặt trước (Pre-order) để có giá tốt nhất.',
+                        isVisible: true,
+                        order: 10 // High order to append to end
+                    });
+                }
+                if (!existingIds.has('events')) {
+                    missingSections.push({
+                         id: 'events',
+                        type: 'events',
+                        title: 'Lịch Sự Kiện Cộng Đồng',
+                        subtitle: 'Những buổi gặp gỡ, chia sẻ và kết nối sắp diễn ra.',
+                        isVisible: true,
+                        order: 11
+                    });
+                }
+                 if (!existingIds.has('blog')) {
+                    missingSections.push({
+                        id: 'blog',
+                        type: 'blog',
+                        title: 'Dưỡng Vườn Tâm',
+                        subtitle: 'Góc nhỏ để chúng ta cùng nhau chia sẻ về lối sống xanh.',
+                        isVisible: true,
+                        order: 12
+                    });
+                }
+
+                if (missingSections.length > 0) {
+                    console.log("Migrating missing sections to Home page:", missingSections);
+                    homePage.sections = [...homePage.sections, ...missingSections];
+                    // Save immediately to persist for Admin
+                    await supabase.from('pages').upsert({
+                         slug: 'home',
+                         data: homePage,
+                         updated_at: new Date().toISOString()
+                    });
+                }
+            }
+
             // Ensure About Page exists
             if (!cache.pages.find(p => p.slug === 'about')) {
                 const aboutPage = INITIAL_PAGES.find(p => p.slug === 'about');
