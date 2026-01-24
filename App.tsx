@@ -9,6 +9,7 @@ import { Loader2, AlertCircle } from 'lucide-react';
 
 // Lazy load pages for better performance
 const Home = React.lazy(() => import('./pages/public/Home'));
+const About = React.lazy(() => import('./pages/public/About')); // Added About
 const Model = React.lazy(() => import('./pages/public/Model'));
 const Leader = React.lazy(() => import('./pages/public/Leader'));
 const Products = React.lazy(() => import('./pages/public/Products'));
@@ -145,6 +146,7 @@ const App = () => {
         <Routes>
           {/* Public Routes */}
           <Route path="/" element={<PublicLayout><Home /></PublicLayout>} />
+          <Route path="/about" element={<PublicLayout><About /></PublicLayout>} />
           <Route path="/model" element={<PublicLayout><Model /></PublicLayout>} />
           <Route path="/leader" element={<PublicLayout><Leader /></PublicLayout>} />
           <Route path="/products" element={<PublicLayout><Products /></PublicLayout>} />

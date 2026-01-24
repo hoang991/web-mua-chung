@@ -51,7 +51,7 @@ export interface SectionItem {
 
 export interface SectionContent {
   id: string;
-  type: 'hero' | 'text' | 'features' | 'cta' | 'diagram' | 'image-text' | 'timeline';
+  type: 'hero' | 'text' | 'features' | 'cta' | 'diagram' | 'image-text' | 'timeline' | 'products' | 'events' | 'blog';
   title: string;
   subtitle?: string;
   content?: string;

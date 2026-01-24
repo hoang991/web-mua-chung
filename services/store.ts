@@ -50,18 +50,106 @@ const INITIAL_PAGES: PageData[] = [
         ]
       },
       {
-        id: 'trust',
-        type: 'image-text',
-        title: 'Khác biệt để bền vững',
-        content: 'Chúng tôi gom đơn định kỳ để tối ưu vận chuyển. Chỉ có 1 tầng Trưởng Nhóm duy nhất. Chia sẻ giá trị giải pháp thực.',
-        image: 'https://picsum.photos/800/600?grayscale',
+        id: 'products',
+        type: 'products',
+        title: 'Vườn giải pháp kỳ này',
+        subtitle: 'Các giải pháp được tuyển chọn kỹ lưỡng từ những nhà sản xuất uy tín. Đặt trước (Pre-order) để có giá tốt nhất.',
+        isVisible: true,
+        order: 3
+      },
+      {
+        id: 'events',
+        type: 'events',
+        title: 'Lịch Sự Kiện Cộng Đồng',
+        subtitle: 'Những buổi gặp gỡ, chia sẻ và kết nối sắp diễn ra.',
+        isVisible: true,
+        order: 4
+      },
+      {
+        id: 'blog',
+        type: 'blog',
+        title: 'Dưỡng Vườn Tâm',
+        subtitle: 'Góc nhỏ để chúng ta cùng nhau chia sẻ về lối sống xanh, những câu chuyện tử tế và cách nuôi dưỡng bình an trong tâm hồn.',
+        isVisible: true,
+        order: 5
+      }
+    ]
+  },
+  {
+    slug: 'about',
+    title: 'Về chúng tôi',
+    status: 'published',
+    updatedAt: new Date().toISOString(),
+    metaTitle: 'Về Alo Mua Chung - Hành trình tử tế',
+    metaDescription: 'Câu chuyện về sự ra đời của Alo Mua Chung và sứ mệnh kết nối cộng đồng.',
+    sections: [
+      {
+        id: 'about-hero',
+        type: 'hero',
+        title: 'Hành trình gieo mầm tử tế',
+        subtitle: 'Alo Mua Chung không chỉ là một nền tảng mua sắm, đó là câu chuyện về niềm tin và sự kết nối giữa người với người.',
+        isVisible: true,
+        order: 1,
+        image: 'https://images.unsplash.com/photo-1542601906990-b4d3fb7d5c73?auto=format&fit=crop&q=80&w=1200'
+      },
+      {
+        id: 'our-story',
+        type: 'text',
+        title: 'Câu chuyện khởi nguồn',
+        content: `
+<h3>Từ những trăn trở đời thường</h3>
+<p>Chúng tôi bắt đầu Alo Mua Chung từ những câu hỏi rất đỗi bình thường: "Tại sao rau sạch lại đắt thế?", "Làm sao để biết chắc chắn miếng thịt này an toàn?", và "Tại sao người nông dân làm ra sản phẩm tốt lại hay bị ép giá?".</p>
+<p>Chúng tôi nhận ra rằng, khoảng cách giữa "người làm ra" và "người sử dụng" đang quá xa. Hàng hóa đi qua quá nhiều khâu trung gian, đẩy giá lên cao trong khi chất lượng khó kiểm soát. Niềm tin dần bị bào mòn.</p>
+
+<h3>Đến giải pháp của cộng đồng</h3>
+<p>Alo Mua Chung ra đời với sứ mệnh đơn giản: <strong>Rút ngắn khoảng cách</strong>.</p>
+<p>Chúng tôi không phải là một siêu thị khổng lồ nhập hàng về bán. Chúng tôi là người tổ chức, kết nối các gia đình (thông qua Trưởng Nhóm Khu Vực) để cùng nhau đặt hàng trực tiếp từ Nhà sản xuất.</p>
+<p>Khi chúng ta mua chung, chúng ta có sức mạnh:</p>
+<ul>
+    <li>Sức mạnh để đàm phán giá tốt nhất (giá sỉ/giá gốc).</li>
+    <li>Sức mạnh để yêu cầu nhà sản xuất minh bạch quy trình.</li>
+    <li>Sức mạnh để giảm thiểu lãng phí bao bì và vận chuyển lẻ tẻ.</li>
+</ul>
+        `,
+        isVisible: true,
+        order: 2
+      },
+      {
+        id: 'core-values',
+        type: 'features',
+        title: 'Giá trị cốt lõi',
+        subtitle: 'Kim chỉ nam cho mọi hoạt động của chúng tôi',
         isVisible: true,
         order: 3,
         items: [
-            { title: "Không bán lẻ", description: "Gom đơn để tối ưu chi phí" },
-            { title: "Không đa cấp", description: "Chỉ 1 tầng Trưởng Nhóm duy nhất" },
-            { title: "Minh bạch 100%", description: "Về nguồn gốc và giá thành" }
+            {
+                title: "Sự Thật (Truth)",
+                description: "Nói đúng về sản phẩm. Không nói quá, không che giấu. Nguồn gốc ở đâu, quy trình thế nào, chúng tôi công khai thế ấy."
+            },
+            {
+                title: "Tử Tế (Kindness)",
+                description: "Tử tế với người tiêu dùng bằng giá tốt và hàng sạch. Tử tế với người sản xuất bằng lợi nhuận công bằng. Tử tế với môi trường."
+            },
+            {
+                title: "Cộng Đồng (Community)",
+                description: "Chúng tôi xây dựng những nhóm mua chung tình làng nghĩa xóm, nơi mọi người không chỉ mua hàng mà còn chia sẻ cuộc sống."
+            }
         ]
+      },
+      {
+        id: 'closing',
+        type: 'text',
+        title: 'Lời ngỏ',
+        content: `
+<p style="text-align: center; font-style: italic;">
+"Chúng tôi tin rằng, mỗi đơn hàng bạn đặt không chỉ là một giao dịch thương mại, mà là một lá phiếu ủng hộ cho một nền sản xuất tử tế và một lối sống xanh hơn. Cảm ơn bạn đã trở thành một phần của hành trình này."
+</p>
+<p style="text-align: center; font-weight: bold; margin-top: 20px;">
+— Đội ngũ Alo Mua Chung
+</p>
+        `,
+        isVisible: true,
+        order: 4
       }
     ]
   },
@@ -262,16 +350,47 @@ export const storageService = {
         // 1. Config
         const { data: configData } = await supabase.from('config').select('*').eq('key', 'main').single();
         if (configData) {
-            cache.config = { ...DEFAULT_CONFIG, ...configData.value };
+            // Update Menu Labels specifically for this request if using existing config
+            const loadedConfig = configData.value;
+            
+            // Migration logic for old menu names (Optional but safe)
+            const menu = loadedConfig.mainMenu || DEFAULT_CONFIG.mainMenu;
+            const homeIdx = menu.findIndex((m: any) => m.path === '/');
+            if (homeIdx >= 0) menu[homeIdx].name = 'Trang chủ';
+            
+            // Check if About exists, if not add it
+            if (!menu.find((m: any) => m.path === '/about')) {
+                menu.splice(1, 0, { id: 'about-us', name: 'Về chúng tôi', path: '/about', isVisible: true, order: 1.5 });
+            }
+
+            cache.config = { ...DEFAULT_CONFIG, ...loadedConfig, mainMenu: menu };
         } else {
-            await supabase.from('config').insert({ key: 'main', value: DEFAULT_CONFIG });
-            cache.config = DEFAULT_CONFIG;
+            // Updated DEFAULT_CONFIG with new menu
+            const newDefault = { ...DEFAULT_CONFIG };
+            newDefault.mainMenu = [
+                { id: '1', name: 'Trang chủ', path: '/', isVisible: true, order: 1 },
+                { id: 'about-us', name: 'Về chúng tôi', path: '/about', isVisible: true, order: 2 },
+                { id: '2', name: 'Mô hình', path: '/model', isVisible: true, order: 3 },
+                { id: '3', name: 'Trưởng Nhóm KV', path: '/leader', isVisible: true, order: 4 },
+                { id: '4', name: 'Vườn giải pháp', path: '/products', isVisible: true, order: 5 },
+                { id: '5', name: 'Dưỡng vườn tâm', path: '/blog', isVisible: true, order: 6 },
+            ];
+            await supabase.from('config').insert({ key: 'main', value: newDefault });
+            cache.config = newDefault;
         }
 
         // 2. Pages
         const { data: pagesData } = await supabase.from('pages').select('*');
         if (pagesData && pagesData.length > 0) {
             cache.pages = pagesData.map(p => ({ ...p.data, slug: p.slug }));
+            // Ensure About Page exists
+            if (!cache.pages.find(p => p.slug === 'about')) {
+                const aboutPage = INITIAL_PAGES.find(p => p.slug === 'about');
+                if (aboutPage) {
+                    cache.pages.push(aboutPage);
+                    await supabase.from('pages').insert({ slug: 'about', data: aboutPage });
+                }
+            }
         } else {
             cache.pages = INITIAL_PAGES;
             for (const p of INITIAL_PAGES) {
