@@ -104,7 +104,7 @@ const PostEditor = ({ post: initialPost, onBack }: { post: SupplierPost; onBack:
   
   // AI Modal
   const [aiModalOpen, setAiModalOpen] = useState(false);
-  const [aiTargetField, setAiTargetField] = useState<'content' | 'title'>('content');
+  const [aiTargetField, setAiTargetField] = useState<'bulk' | 'content' | 'title'>('content');
 
   const handleSave = async () => {
     if (!post.title) return alert("Vui lòng nhập tiêu đề");
@@ -124,13 +124,22 @@ const PostEditor = ({ post: initialPost, onBack }: { post: SupplierPost; onBack:
     }
   };
 
-  const openAiModal = (field: 'content' | 'title') => {
+  const openAiModal = (field: 'bulk' | 'content' | 'title') => {
       setAiTargetField(field);
       setAiModalOpen(true);
   };
 
-  const handleAiGenerated = (text: string) => {
-      setPost(prev => ({ ...prev, [aiTargetField]: text }));
+  const handleAiGenerated = (data: any) => {
+      if (aiTargetField === 'bulk') {
+          setPost(prev => ({
+              ...prev,
+              title: data.title,
+              slug: data.slug,
+              content: data.content
+          }));
+      } else {
+          setPost(prev => ({ ...prev, [aiTargetField]: data }));
+      }
   };
 
   const handleImageSelect = (url: string) => {
@@ -150,8 +159,8 @@ const PostEditor = ({ post: initialPost, onBack }: { post: SupplierPost; onBack:
         isOpen={aiModalOpen}
         onClose={() => setAiModalOpen(false)}
         onGenerate={handleAiGenerated}
-        initialPrompt={post.title || ''}
-        type={aiTargetField === 'title' ? 'title' : 'content'}
+        initialPrompt={aiTargetField === 'bulk' ? '' : (post.title || '')}
+        type={aiTargetField === 'bulk' ? 'bulk_supplier' : (aiTargetField === 'title' ? 'title' : 'content')}
       />
 
       <div className="flex items-center justify-between">
@@ -164,6 +173,9 @@ const PostEditor = ({ post: initialPost, onBack }: { post: SupplierPost; onBack:
             </h1>
         </div>
         <div className="flex gap-2">
+            <Button onClick={() => openAiModal('bulk')} className="bg-purple-600 hover:bg-purple-700 text-white shadow-lg shadow-purple-200">
+                <Sparkles className="w-4 h-4 mr-2" /> AI Viết toàn bộ
+            </Button>
             <Button onClick={handleSave} className="shadow-lg" disabled={isSaving}>
                 {isSaving ? <Loader2 className="w-5 h-5 mr-2 animate-spin"/> : <Save className="w-5 h-5 mr-2" />}
                 {isSaving ? 'Đang lưu...' : 'Lưu bài viết'}

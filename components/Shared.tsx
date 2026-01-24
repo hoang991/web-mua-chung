@@ -201,9 +201,10 @@ export const VideoPlayer: React.FC<{ url: string, className?: string }> = ({ url
 interface AIModalProps {
     isOpen: boolean;
     onClose: () => void;
-    onGenerate: (text: string) => void;
+    // Modified to accept any data (string or object)
+    onGenerate: (data: any) => void;
     initialPrompt?: string;
-    type?: 'content' | 'title' | 'policy';
+    type?: 'content' | 'title' | 'policy' | 'bulk_blog' | 'bulk_product' | 'bulk_supplier';
 }
 
 export const AIModal: React.FC<AIModalProps> = ({ isOpen, onClose, onGenerate, initialPrompt = '', type = 'content' }) => {
@@ -214,13 +215,15 @@ export const AIModal: React.FC<AIModalProps> = ({ isOpen, onClose, onGenerate, i
 
     if (!isOpen) return null;
 
+    const isBulkMode = type?.startsWith('bulk_');
+
     const handleGenerate = async () => {
         setIsGenerating(true);
         try {
-            const result: any = await aiService.generateText(prompt, { wordCount, outline, type });
-            // Handle if result is object (from old mock) or string
-            const text = typeof result === 'string' ? result : (result.description || result.content);
-            onGenerate(text);
+            const result = await aiService.generateText(prompt, { wordCount, outline, type });
+            // The result can now be a string OR an object. 
+            // The parent component will handle the type casting.
+            onGenerate(result);
             onClose();
         } catch (e) {
             alert('Lỗi tạo nội dung AI');
@@ -234,7 +237,7 @@ export const AIModal: React.FC<AIModalProps> = ({ isOpen, onClose, onGenerate, i
             <div className="bg-white rounded-xl shadow-2xl w-full max-w-lg flex flex-col overflow-hidden">
                 <div className="flex justify-between items-center p-4 border-b bg-gradient-to-r from-purple-50 to-white">
                     <h3 className="text-lg font-bold flex items-center gap-2 text-purple-700">
-                        <Sparkles className="w-5 h-5" /> Trợ lý AI Viết bài
+                        <Sparkles className="w-5 h-5" /> {isBulkMode ? 'AI Viết Toàn Bộ' : 'Trợ lý AI Viết bài'}
                     </h3>
                     <button onClick={onClose} className="p-1 hover:bg-stone-100 rounded-full">
                         <X className="w-5 h-5 text-stone-500" />
@@ -242,9 +245,15 @@ export const AIModal: React.FC<AIModalProps> = ({ isOpen, onClose, onGenerate, i
                 </div>
                 
                 <div className="p-6 space-y-4">
+                    <div className="bg-purple-50 p-3 rounded-lg border border-purple-100 text-sm text-purple-800 mb-2">
+                         {isBulkMode 
+                            ? "AI sẽ tự động điền Tiêu đề, Mô tả và Nội dung chi tiết dựa trên chủ đề bạn nhập." 
+                            : "AI sẽ tạo nội dung cho trường dữ liệu bạn đang chọn."}
+                    </div>
+
                     <Input 
-                        label="Chủ đề / Yêu cầu chính"
-                        placeholder="VD: Lợi ích của gạo lứt..."
+                        label={isBulkMode ? "Chủ đề / Tên bài viết" : "Chủ đề / Yêu cầu chính"}
+                        placeholder={isBulkMode ? "VD: Lợi ích của thiền định..." : "VD: Viết đoạn mở đầu..."}
                         value={prompt}
                         onChange={e => setPrompt(e.target.value)}
                     />
@@ -253,23 +262,23 @@ export const AIModal: React.FC<AIModalProps> = ({ isOpen, onClose, onGenerate, i
                         <>
                             <div className="grid grid-cols-2 gap-4">
                                 <div>
-                                    <label className="text-sm font-medium text-stone-700 block mb-1">Số lượng từ (ước lượng)</label>
+                                    <label className="text-sm font-medium text-stone-700 block mb-1">Độ dài mong muốn</label>
                                     <select 
                                         className="w-full border rounded-md p-2 bg-white text-sm"
                                         value={wordCount}
                                         onChange={e => setWordCount(Number(e.target.value))}
                                     >
-                                        <option value={100}>Ngắn (~100 từ)</option>
-                                        <option value={300}>Trung bình (~300 từ)</option>
-                                        <option value={500}>Dài (~500 từ)</option>
+                                        <option value={200}>Ngắn (~200 từ)</option>
+                                        <option value={400}>Trung bình (~400 từ)</option>
+                                        <option value={600}>Dài (~600 từ)</option>
                                         <option value={1000}>Chi tiết (~1000 từ)</option>
                                     </select>
                                 </div>
                             </div>
                             
                             <Textarea 
-                                label="Dàn ý / Ý chính (Tùy chọn)"
-                                placeholder="- Giới thiệu chung&#10;- Lợi ích sức khỏe&#10;- Cách sử dụng"
+                                label="Dàn ý / Ghi chú thêm (Tùy chọn)"
+                                placeholder="- Giới thiệu chung&#10;- Lợi ích chính&#10;- Kết luận"
                                 rows={4}
                                 value={outline}
                                 onChange={e => setOutline(e.target.value)}
@@ -283,10 +292,10 @@ export const AIModal: React.FC<AIModalProps> = ({ isOpen, onClose, onGenerate, i
                     <Button 
                         onClick={handleGenerate} 
                         disabled={isGenerating || !prompt}
-                        className="bg-purple-600 hover:bg-purple-700 text-white"
+                        className="bg-purple-600 hover:bg-purple-700 text-white shadow-lg shadow-purple-200"
                     >
                         {isGenerating ? <Loader2 className="w-4 h-4 animate-spin mr-2"/> : <Wand2 className="w-4 h-4 mr-2"/>}
-                        {isGenerating ? 'AI đang viết...' : 'Tạo nội dung'}
+                        {isGenerating ? 'AI đang viết...' : (isBulkMode ? 'Điền tự động tất cả' : 'Tạo nội dung')}
                     </Button>
                 </div>
             </div>

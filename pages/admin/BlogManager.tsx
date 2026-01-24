@@ -140,7 +140,8 @@ const BlogEditor = ({ post: initialPost, onBack }: { post: BlogPost; onBack: () 
   
   // AI State
   const [aiModalOpen, setAiModalOpen] = useState(false);
-  const [aiTargetField, setAiTargetField] = useState<'content' | 'excerpt' | 'title'>('content');
+  // 'bulk' means we fill all fields. other values mean specific field.
+  const [aiTargetField, setAiTargetField] = useState<'bulk' | 'content' | 'excerpt' | 'title'>('content');
 
   // Initialize location if it doesn't exist but category is tea
   useEffect(() => {
@@ -171,13 +172,25 @@ const BlogEditor = ({ post: initialPost, onBack }: { post: BlogPost; onBack: () 
     }
   };
 
-  const openAiModal = (field: 'content' | 'excerpt' | 'title') => {
+  const openAiModal = (field: 'bulk' | 'content' | 'excerpt' | 'title') => {
       setAiTargetField(field);
       setAiModalOpen(true);
   };
 
-  const handleAiGenerated = (text: string) => {
-      setPost(prev => ({ ...prev, [aiTargetField]: text }));
+  const handleAiGenerated = (data: any) => {
+      if (aiTargetField === 'bulk') {
+          // Bulk update
+          setPost(prev => ({
+              ...prev,
+              title: data.title,
+              slug: data.slug,
+              excerpt: data.excerpt,
+              content: data.content
+          }));
+      } else {
+          // Single field update (data is string)
+          setPost(prev => ({ ...prev, [aiTargetField]: data }));
+      }
   };
 
   const handleImageSelect = (url: string) => {
@@ -197,8 +210,8 @@ const BlogEditor = ({ post: initialPost, onBack }: { post: BlogPost; onBack: () 
         isOpen={aiModalOpen}
         onClose={() => setAiModalOpen(false)}
         onGenerate={handleAiGenerated}
-        initialPrompt={post.title || ''}
-        type={aiTargetField === 'title' ? 'title' : 'content'}
+        initialPrompt={aiTargetField === 'bulk' ? '' : (post.title || '')}
+        type={aiTargetField === 'bulk' ? 'bulk_blog' : (aiTargetField === 'title' ? 'title' : 'content')}
       />
 
       <div className="flex items-center justify-between">
@@ -211,6 +224,9 @@ const BlogEditor = ({ post: initialPost, onBack }: { post: BlogPost; onBack: () 
             </h1>
         </div>
         <div className="flex gap-2">
+            <Button onClick={() => openAiModal('bulk')} className="bg-purple-600 hover:bg-purple-700 text-white shadow-lg shadow-purple-200">
+                <Sparkles className="w-4 h-4 mr-2" /> AI Viết toàn bộ
+            </Button>
             <Button onClick={handleSave} className="shadow-lg" disabled={isSaving}>
                 {isSaving ? <Loader2 className="w-5 h-5 mr-2 animate-spin"/> : <Save className="w-5 h-5 mr-2" />}
                 {isSaving ? 'Đang lưu...' : 'Lưu bài viết'}

@@ -126,7 +126,7 @@ const ProductEditor = ({ product: initialProduct, onBack }: { product: Product; 
   
   // AI Modal State
   const [aiModalOpen, setAiModalOpen] = useState(false);
-  const [aiTargetField, setAiTargetField] = useState<'description' | 'shortDescription'>('description');
+  const [aiTargetField, setAiTargetField] = useState<'bulk' | 'description' | 'shortDescription'>('description');
 
   const handleSave = async () => {
     if (!product.name) return alert("Vui lòng nhập tên sản phẩm");
@@ -147,13 +147,24 @@ const ProductEditor = ({ product: initialProduct, onBack }: { product: Product; 
     }
   };
 
-  const openAiModal = (field: 'description' | 'shortDescription') => {
+  const openAiModal = (field: 'bulk' | 'description' | 'shortDescription') => {
       setAiTargetField(field);
       setAiModalOpen(true);
   };
 
-  const handleAiGenerated = (text: string) => {
-      setProduct(prev => ({ ...prev, [aiTargetField]: text }));
+  const handleAiGenerated = (data: any) => {
+      if (aiTargetField === 'bulk') {
+          // Bulk update
+          setProduct(prev => ({
+              ...prev,
+              name: data.name,
+              slug: data.slug,
+              shortDescription: data.shortDescription,
+              description: data.description
+          }));
+      } else {
+          setProduct(prev => ({ ...prev, [aiTargetField]: data }));
+      }
   };
 
   const updatePricing = (idx: number, field: keyof PricingTier, value: any) => {
@@ -200,7 +211,8 @@ const ProductEditor = ({ product: initialProduct, onBack }: { product: Product; 
         isOpen={aiModalOpen}
         onClose={() => setAiModalOpen(false)}
         onGenerate={handleAiGenerated}
-        initialPrompt={product.name ? `Viết nội dung cho sản phẩm: ${product.name}` : ''}
+        initialPrompt={aiTargetField === 'bulk' ? '' : (product.name ? `Viết nội dung cho sản phẩm: ${product.name}` : '')}
+        type={aiTargetField === 'bulk' ? 'bulk_product' : 'content'}
       />
 
       <div className="flex items-center justify-between">
@@ -213,6 +225,9 @@ const ProductEditor = ({ product: initialProduct, onBack }: { product: Product; 
             </h1>
         </div>
         <div className="flex gap-2">
+            <Button onClick={() => openAiModal('bulk')} className="bg-purple-600 hover:bg-purple-700 text-white shadow-lg shadow-purple-200">
+                <Sparkles className="w-4 h-4 mr-2" /> AI Viết toàn bộ
+            </Button>
             <Button onClick={handleSave} className="shadow-lg" disabled={isSaving}>
                 {isSaving ? <Loader2 className="w-5 h-5 mr-2 animate-spin"/> : <Save className="w-5 h-5 mr-2" />}
                 {isSaving ? 'Đang lưu...' : 'Lưu sản phẩm'}
