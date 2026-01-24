@@ -4,7 +4,7 @@ import { Link } from 'react-router-dom';
 import { storageService } from '../../services/store';
 import { Product } from '../../types';
 import { Container, Section, Card, Button, FadeIn, cn } from '../../components/Shared';
-import { ShoppingCart, Tag, Check, ArrowRight, ChevronLeft, ChevronRight, X, Sun, Heart, Brain, LayoutGrid, Coffee } from 'lucide-react';
+import { ShoppingCart, X, ArrowRight, ChevronLeft, ChevronRight, Sun, Heart, Brain, LayoutGrid, Coffee } from 'lucide-react';
 
 const Products = () => {
   const [products, setProducts] = useState<Product[]>([]);

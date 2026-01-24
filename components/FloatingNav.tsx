@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from 'react';
 import { ArrowUp, Home } from 'lucide-react';
 import { Link } from 'react-router-dom';
@@ -24,7 +25,7 @@ export const FloatingNav = () => {
   };
 
   return (
-    <div className="fixed bottom-6 left-6 z-40 flex flex-col gap-3">
+    <div className="fixed bottom-6 left-6 z-40 flex flex-col gap-3 print:hidden">
       {/* Scroll Top Button */}
       <button
         onClick={scrollToTop}
@@ -33,12 +34,13 @@ export const FloatingNav = () => {
           showScroll ? "opacity-100 translate-y-0" : "opacity-0 translate-y-10 pointer-events-none"
         )}
         aria-label="Lên đầu trang"
+        title="Lên đầu trang"
       >
         <ArrowUp className="w-5 h-5" />
       </button>
 
       {/* Home Button */}
-      <Link to="/">
+      <Link to="/" title="Về trang chủ">
         <button
           className="p-3 rounded-full bg-emerald-600 text-white shadow-lg hover:bg-emerald-700 transition-transform hover:scale-110"
           aria-label="Về trang chủ"
