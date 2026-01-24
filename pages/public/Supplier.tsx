@@ -3,7 +3,7 @@ import React, { useState, useEffect } from 'react';
 import { storageService } from '../../services/store';
 import { SupplierPost } from '../../types';
 import { Container, Section, Card, Button, FadeIn, Input, Textarea, VideoPlayer } from '../../components/Shared';
-import { Handshake, TrendingUp, Users, CheckCircle, Loader2, Video } from 'lucide-react';
+import { ShieldCheck, TrendingUp, Users, CheckCircle, Loader2, Video } from 'lucide-react';
 
 const Supplier = () => {
   const [posts, setPosts] = useState<SupplierPost[]>([]);
@@ -79,7 +79,7 @@ const Supplier = () => {
                   {[
                       { icon: TrendingUp, title: "Đầu ra ổn định", desc: "Sản xuất theo số lượng đặt trước. Không lo tồn kho, không lo hư hỏng nông sản." },
                       { icon: Users, title: "Tiếp cận cộng đồng", desc: "Đưa sản phẩm trực tiếp đến tay hàng ngàn hộ gia đình thông qua mạng lưới Trưởng Nhóm Khu Vực tin cậy." },
-                      { icon: Handshake, title: "Hợp tác minh bạch", desc: "Thanh toán rõ ràng, sòng phẳng. Tôn trọng giá trị thương hiệu của Nhà sản xuất." }
+                      { icon: ShieldCheck, title: "Hợp tác minh bạch", desc: "Thanh toán rõ ràng, sòng phẳng. Tôn trọng giá trị thương hiệu của Nhà sản xuất." }
                   ].map((item, i) => (
                       <FadeIn key={i} delay={i * 100}>
                           <Card className="p-8 h-full border-t-4 border-stone-800">
