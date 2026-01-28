@@ -55,7 +55,8 @@ const BlogPost = () => {
                             <Link to="/blog" className="inline-flex items-center text-stone-200 hover:text-white mb-4 text-sm font-medium transition-colors">
                                 <ArrowLeft className="w-4 h-4 mr-2" /> Dưỡng Vườn Tâm
                             </Link>
-                            <h1 className="text-3xl md:text-5xl font-bold leading-tight mb-4 font-serif">
+                            {/* Changed to font-bold tracking-normal (removed font-serif) */}
+                            <h1 className="text-3xl md:text-5xl font-bold leading-snug mb-4 tracking-normal">
                                 {post.title}
                             </h1>
                             <div className="flex items-center gap-6 text-sm text-stone-200">
@@ -83,7 +84,7 @@ const BlogPost = () => {
                         )}
 
                          <div 
-                            className="prose prose-lg prose-stone max-w-none prose-headings:font-serif prose-headings:text-emerald-900 prose-a:text-emerald-600"
+                            className="prose prose-lg prose-stone max-w-none prose-headings:text-emerald-900 prose-a:text-emerald-600 text-left"
                             dangerouslySetInnerHTML={{ __html: post.content }}
                         />
                         

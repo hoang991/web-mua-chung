@@ -3,11 +3,13 @@ import React, { useState } from 'react';
 import { storageService } from '../../services/store';
 import { SiteConfig, ThemeColor, ThemeFont } from '../../types';
 import { Card, Button, Input } from '../../components/Shared';
-import { Palette, Type, Save, Menu as MenuIcon, Eye, EyeOff, ArrowUp, ArrowDown, Loader2, Flower2 } from 'lucide-react';
+import { Palette, Type, Save, Menu as MenuIcon, Eye, EyeOff, ArrowUp, ArrowDown, Loader2, Flower2, Image, Trash2 } from 'lucide-react';
+import { MediaPicker } from './MediaPicker';
 
 export const ThemeCustomizer = () => {
   const [config, setConfig] = useState<SiteConfig>(storageService.getConfig());
   const [isSaving, setIsSaving] = useState(false);
+  const [showMediaPicker, setShowMediaPicker] = useState(false);
 
   const handleSave = async () => {
       setIsSaving(true);
@@ -62,8 +64,21 @@ export const ThemeCustomizer = () => {
       setConfig({ ...config, mainMenu: newMenu });
   };
 
+  const handleLogoSelect = (url: any) => {
+      const logoUrl = Array.isArray(url) ? url[0] : url;
+      setConfig({ ...config, logo: logoUrl });
+      setShowMediaPicker(false);
+  };
+
   return (
     <div className="space-y-8 pb-20">
+      {showMediaPicker && (
+          <MediaPicker 
+            onSelect={handleLogoSelect} 
+            onClose={() => setShowMediaPicker(false)} 
+          />
+      )}
+
       <div className="flex justify-between items-center">
           <h1 className="text-2xl font-bold text-stone-900">Giao diện & Menu</h1>
           <Button onClick={handleSave} className="shadow-lg" disabled={isSaving}>
@@ -93,6 +108,37 @@ export const ThemeCustomizer = () => {
                           />
                           <div className="w-11 h-6 bg-stone-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-pink-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-pink-600"></div>
                       </label>
+                  </div>
+              </Card>
+
+              {/* Logo Section */}
+              <Card className="p-6">
+                  <h3 className="font-bold text-lg mb-4 flex items-center gap-2"><Image className="w-5 h-5"/> Logo Website</h3>
+                  <div className="flex items-center gap-4">
+                      <div className="h-20 w-20 bg-stone-100 rounded-lg border border-stone-200 flex items-center justify-center overflow-hidden relative group">
+                          {config.logo ? (
+                              <>
+                                  <img src={config.logo} alt="Logo" className="w-full h-full object-contain p-1" />
+                                  <button 
+                                      onClick={() => setConfig({...config, logo: undefined})}
+                                      className="absolute top-1 right-1 bg-white rounded-full p-1 shadow text-red-500 opacity-0 group-hover:opacity-100 transition-opacity"
+                                  >
+                                      <Trash2 className="w-3 h-3" />
+                                  </button>
+                              </>
+                          ) : (
+                              <span className="text-xs text-stone-400">Chưa có logo</span>
+                          )}
+                      </div>
+                      <div className="space-y-2">
+                          <Button size="sm" variant="outline" onClick={() => setShowMediaPicker(true)}>
+                              Chọn logo từ thư viện
+                          </Button>
+                          <p className="text-xs text-stone-500">
+                              Nên dùng ảnh PNG nền trong suốt.<br/>
+                              Nếu chọn logo, tên website sẽ bị ẩn.
+                          </p>
+                      </div>
                   </div>
               </Card>
 

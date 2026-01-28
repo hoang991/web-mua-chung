@@ -12,6 +12,7 @@ export interface MenuLink {
 
 export interface SiteConfig {
   siteName: string;
+  logo?: string; // New Logo Field
   contactEmail: string;
   contactPhone: string;
   primaryColor: ThemeColor;

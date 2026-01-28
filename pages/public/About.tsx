@@ -50,7 +50,8 @@ const About = () => {
                     )}
                     <Container className="relative z-10 text-center text-white px-4">
                         <FadeIn>
-                            <h1 className="text-3xl md:text-5xl lg:text-6xl font-serif font-bold mb-6 tracking-wide">
+                            {/* Changed font-serif to font-sans and ensured tracking-normal */}
+                            <h1 className="text-3xl md:text-5xl lg:text-6xl font-bold mb-6 tracking-normal">
                                 {section.title}
                             </h1>
                         </FadeIn>
@@ -69,11 +70,12 @@ const About = () => {
                     <Container className="max-w-4xl">
                         <FadeIn>
                             <div className="text-center mb-10">
-                                <h2 className="text-3xl font-bold text-stone-900 mb-4 font-serif">{section.title}</h2>
+                                {/* Removed font-serif */}
+                                <h2 className="text-3xl font-bold text-stone-900 mb-4 tracking-normal">{section.title}</h2>
                                 {section.subtitle && <p className="text-stone-500 italic">{section.subtitle}</p>}
                             </div>
                             <div 
-                                className="prose prose-lg prose-stone max-w-none prose-headings:font-serif prose-headings:text-emerald-800 prose-p:leading-relaxed"
+                                className="prose prose-lg prose-stone max-w-none prose-headings:text-emerald-800 prose-p:leading-relaxed text-left"
                                 dangerouslySetInnerHTML={{ __html: section.content || '' }}
                             />
                         </FadeIn>
@@ -86,7 +88,8 @@ const About = () => {
                 <Section key={section.id} className="bg-stone-50">
                     <Container>
                         <div className="text-center mb-12">
-                            <h2 className="text-3xl font-bold text-stone-900 mb-4 font-serif">{section.title}</h2>
+                            {/* Removed font-serif */}
+                            <h2 className="text-3xl font-bold text-stone-900 mb-4 tracking-normal">{section.title}</h2>
                             <p className="text-stone-600 max-w-2xl mx-auto">{section.subtitle}</p>
                         </div>
                         <div className="grid md:grid-cols-3 gap-8">
@@ -98,7 +101,8 @@ const About = () => {
                                             <div className={`w-14 h-14 ${bg} rounded-full flex items-center justify-center mb-6`}>
                                                 <Icon className={`w-7 h-7 ${color}`} />
                                             </div>
-                                            <h3 className="text-xl font-bold mb-4 font-serif">{item.title}</h3>
+                                            {/* Removed font-serif */}
+                                            <h3 className="text-xl font-bold mb-4 tracking-normal">{item.title}</h3>
                                             <p className="text-stone-600 leading-relaxed">
                                                 {item.description}
                                             </p>
@@ -122,8 +126,9 @@ const About = () => {
                                 </div>
                             </FadeIn>
                             <div className="space-y-6">
-                                <h2 className="text-3xl font-bold text-stone-900 font-serif">{section.title}</h2>
-                                <div className="prose prose-stone" dangerouslySetInnerHTML={{ __html: section.content || '' }}></div>
+                                {/* Removed font-serif */}
+                                <h2 className="text-3xl font-bold text-stone-900 tracking-normal">{section.title}</h2>
+                                <div className="prose prose-stone text-left" dangerouslySetInnerHTML={{ __html: section.content || '' }}></div>
                             </div>
                         </div>
                     </Container>

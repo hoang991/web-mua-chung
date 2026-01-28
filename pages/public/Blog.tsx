@@ -54,8 +54,10 @@ const Blog = () => {
                      <div className="absolute bottom-0 left-0 w-80 h-80 bg-amber-200 rounded-full blur-3xl translate-y-1/2 -translate-x-1/4"></div>
                  </div>
                 <Container className="relative z-10 text-center">
-                    <span className="text-emerald-700 font-bold tracking-widest text-sm uppercase mb-3 block">Alo Mua Chung</span>
-                    <h1 className="text-4xl md:text-5xl font-serif font-bold text-stone-900 mb-6">Dưỡng Vườn Tâm</h1>
+                    {/* Removed tracking-widest */}
+                    <span className="text-emerald-700 font-bold text-sm uppercase mb-3 block">Alo Mua Chung</span>
+                    {/* Changed font-serif to font-sans/default and tracking-normal */}
+                    <h1 className="text-4xl md:text-5xl font-bold text-stone-900 mb-6 tracking-normal">Dưỡng Vườn Tâm</h1>
                     <p className="text-lg text-stone-600 max-w-2xl mx-auto leading-relaxed">
                         Nơi chia sẻ những câu chuyện về lối sống xanh, sự tử tế và cách chúng ta cùng nhau nuôi dưỡng tâm hồn giữa cuộc sống bộn bề.
                     </p>

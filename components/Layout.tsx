@@ -70,10 +70,20 @@ export const PublicLayout: React.FC<LayoutProps> = ({ children }) => {
 
         <Container className="flex h-16 md:h-20 items-center justify-between relative z-50">
           <Link to="/" className="flex items-center gap-2 group z-50 relative">
-            <div className={cn("p-2 rounded-full transition-colors", activeColorClass)}>
-              <Leaf className="w-6 h-6" />
-            </div>
-            <span className="font-bold text-lg md:text-xl tracking-tight text-stone-900 line-clamp-1">{config.siteName}</span>
+            {config.logo ? (
+                <img 
+                    src={config.logo} 
+                    alt={config.siteName} 
+                    className="h-10 md:h-14 w-auto object-contain" 
+                />
+            ) : (
+                <>
+                    <div className={cn("p-2 rounded-full transition-colors", activeColorClass)}>
+                        <Leaf className="w-6 h-6" />
+                    </div>
+                    <span className="font-bold text-lg md:text-xl tracking-tight text-stone-900 line-clamp-1">{config.siteName}</span>
+                </>
+            )}
           </Link>
 
           {/* Desktop Nav */}
@@ -163,8 +173,14 @@ export const PublicLayout: React.FC<LayoutProps> = ({ children }) => {
         <Container className="grid grid-cols-1 md:grid-cols-4 gap-8 md:gap-12">
           <div className="space-y-4">
             <div className="flex items-center gap-2 text-stone-100">
-              <Leaf className={`w-5 h-5 text-${config.primaryColor}-500`} />
-              <span className="font-bold text-lg">{config.siteName}</span>
+              {config.logo ? (
+                  <img src={config.logo} alt={config.siteName} className="h-10 w-auto object-contain brightness-0 invert opacity-80" />
+              ) : (
+                  <>
+                    <Leaf className={`w-5 h-5 text-${config.primaryColor}-500`} />
+                    <span className="font-bold text-lg">{config.siteName}</span>
+                  </>
+              )}
             </div>
             <p className="text-sm leading-relaxed max-w-xs">
               {config.seoDescription}
